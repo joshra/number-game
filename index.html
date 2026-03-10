@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Number Gate Rush</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="panel intro-panel">
+        <p class="eyebrow">Arcade Prototype</p>
+        <h1>Number Gate Rush</h1>
+        <p class="intro-copy">
+          左右切換跑道，持續射擊數字方塊，把它打到 0，吃掉上面的加成道具，撐到終點打爆 Boss。
+        </p>
+        <div class="legend">
+          <span class="badge plus">藍綠方塊：可射擊道具</span>
+          <span class="badge minus">大數字：剩餘血量</span>
+          <span class="badge neutral">小字：破壞後獲得的加成</span>
+        </div>
+        <div class="controls">
+          <span><kbd>A</kbd> / <kbd>←</kbd> 往左</span>
+          <span><kbd>D</kbd> / <kbd>→</kbd> 往右</span>
+          <span><kbd>Space</kbd> 重開</span>
+        </div>
+        <button id="start-button" class="primary-button">開始遊戲</button>
+      </section>
+
+      <section class="panel game-panel">
+        <header class="hud">
+          <div class="hud-block">
+            <span class="hud-label">隊伍</span>
+            <strong id="score-value">12</strong>
+          </div>
+          <div class="hud-block">
+            <span class="hud-label">關卡進度</span>
+            <strong id="stage-value">1 / 10</strong>
+          </div>
+          <div class="hud-block">
+            <span class="hud-label">最佳路線</span>
+            <strong id="hint-value">看藍避紅</strong>
+          </div>
+          <div class="hud-block">
+            <span class="hud-label">連擊</span>
+            <strong id="combo-value">0</strong>
+          </div>
+        </header>
+
+        <div class="game-frame">
+          <canvas id="game" width="420" height="720" aria-label="Number Gate Rush"></canvas>
+          <div id="overlay" class="overlay">
+            <div class="overlay-card">
+              <p id="overlay-kicker" class="overlay-kicker">準備衝刺</p>
+              <h2 id="overlay-title">選對門，把數字滾大</h2>
+              <p id="overlay-text">
+                角色會自動開火。把方塊數字打到 0 才能拿到對應加成，漏掉整排會直接扣分。
+              </p>
+              <button id="restart-button" class="primary-button">開始</button>
+            </div>
+          </div>
+        </div>
+        <div class="touch-controls" aria-label="Touch controls">
+          <button id="left-button" class="touch-button" type="button">往左</button>
+          <button id="right-button" class="touch-button" type="button">往右</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="./game.js"></script>
+  </body>
+</html>
