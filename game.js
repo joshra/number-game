@@ -17,6 +17,7 @@ const comboValue = document.getElementById("combo-value");
 const boostValue = document.getElementById("boost-value");
 const ultimateValue = document.getElementById("ultimate-value");
 const volumeSlider = document.getElementById("volume-slider");
+const OFFLINE_CACHE_VERSION = "20260311-170739";
 
 const W = canvas.width;
 const H = canvas.height;
@@ -2687,6 +2688,15 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
+function registerOfflineSupport() {
+  if (!("serviceWorker" in navigator)) return;
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register(`./sw.js?v=${OFFLINE_CACHE_VERSION}`).catch((error) => {
+      console.error("Service worker registration failed", error);
+    });
+  });
+}
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
     if (event.key === "ArrowLeft") event.preventDefault();
@@ -2723,6 +2733,7 @@ canvas.addEventListener("pointerdown", (event) => {
 });
 
 installAudioUnlock();
+registerOfflineSupport();
 
 window.__gameDebug = {
   getSnapshot() {

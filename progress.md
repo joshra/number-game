@@ -8,3 +8,5 @@ Original prompt: 確保在手機、平板和電腦上容易操作
 - TODO: If future gameplay UI adds more HUD fields, re-check the phone single-column layout and control bar overlap.
 - 2026-03-11: Refined phone layout so the play area appears before HUD, HUD stays two-column, and the intro card collapses to a compact summary on narrow screens.
 - 2026-03-11: Expanded desktop layout to use wider screens more effectively with a larger game column, broader HUD grid, and taller desktop control tiles.
+- 2026-03-11: Added offline-play support with a web app manifest, service worker registration, and precache entries for core local assets.
+- TODO: When future art/audio files are added, include them in `sw.js` precache or switch to a generated asset manifest to avoid stale offline bundles.
