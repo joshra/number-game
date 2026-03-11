@@ -17,7 +17,15 @@ const comboValue = document.getElementById("combo-value");
 const boostValue = document.getElementById("boost-value");
 const ultimateValue = document.getElementById("ultimate-value");
 const volumeSlider = document.getElementById("volume-slider");
-const OFFLINE_CACHE_VERSION = "20260311-170739";
+const appModeLabel = document.getElementById("app-mode-label");
+const networkStatus = document.getElementById("network-status");
+const installButton = document.getElementById("install-button");
+const updateButton = document.getElementById("update-button");
+const OFFLINE_CACHE_VERSION = "20260311-182500";
+const launchParams = new URLSearchParams(window.location.search);
+let deferredInstallPrompt = null;
+let waitingServiceWorker = null;
+let shouldReloadForUpdate = false;
 
 const W = canvas.width;
 const H = canvas.height;
@@ -216,6 +224,79 @@ function resumeAudio() {
 
 function unlockAudio() {
   return resumeAudio();
+}
+
+function isStandaloneMode() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.matchMedia("(display-mode: fullscreen)").matches || window.navigator.standalone === true;
+}
+
+function isHandheldLayout() {
+  return window.matchMedia("(max-width: 1024px)").matches || window.matchMedia("(pointer: coarse)").matches;
+}
+
+function updateAppChrome() {
+  const standalone = isStandaloneMode();
+  const handheld = isHandheldLayout();
+  document.body.dataset.displayMode = standalone ? "standalone" : "browser";
+  document.body.dataset.handheld = handheld ? "true" : "false";
+
+  if (appModeLabel) {
+    appModeLabel.textContent = handheld ? (standalone ? "App 模式" : "瀏覽器模式") : "桌面網頁";
+  }
+
+  if (networkStatus) {
+    networkStatus.textContent = navigator.onLine ? "已連線" : "離線可玩";
+    networkStatus.dataset.online = navigator.onLine ? "true" : "false";
+  }
+
+  if (installButton) {
+    installButton.hidden = !handheld || standalone || !deferredInstallPrompt;
+  }
+
+  if (updateButton) {
+    updateButton.hidden = !handheld || !waitingServiceWorker;
+  }
+}
+
+async function promptInstall() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const result = await deferredInstallPrompt.userChoice;
+  if (result.outcome !== "accepted") {
+    installButton.hidden = false;
+  }
+  deferredInstallPrompt = null;
+  updateAppChrome();
+}
+
+function requestServiceWorkerUpdate() {
+  if (!waitingServiceWorker) return;
+  waitingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+}
+
+function initAppExperience() {
+  window.matchMedia("(display-mode: standalone)").addEventListener("change", updateAppChrome);
+  window.matchMedia("(display-mode: fullscreen)").addEventListener("change", updateAppChrome);
+  window.matchMedia("(max-width: 1024px)").addEventListener("change", updateAppChrome);
+  window.matchMedia("(pointer: coarse)").addEventListener("change", updateAppChrome);
+  window.addEventListener("online", updateAppChrome);
+  window.addEventListener("offline", updateAppChrome);
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    updateAppChrome();
+  });
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    updateAppChrome();
+  });
+  installButton?.addEventListener("click", () => {
+    promptInstall().catch((error) => {
+      console.error("Install prompt failed", error);
+    });
+  });
+  updateButton?.addEventListener("click", requestServiceWorkerUpdate);
+  updateAppChrome();
 }
 
 function installAudioUnlock() {
@@ -1031,6 +1112,9 @@ function startGame() {
   resumeAudio();
   playTone(440, 0.14, { type: "triangle", volume: 0.12 });
   playTone(660, 0.18, { type: "triangle", volume: 0.1, when: 0.08 });
+  if (launchParams.get("source") === "pwa" || launchParams.get("action") === "start") {
+    history.replaceState({}, document.title, window.location.pathname);
+  }
   state.running = true;
   state.troop = 12;
   state.combo = 0;
@@ -2691,9 +2775,36 @@ function loop() {
 function registerOfflineSupport() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register(`./sw.js?v=${OFFLINE_CACHE_VERSION}`).catch((error) => {
-      console.error("Service worker registration failed", error);
-    });
+    navigator.serviceWorker
+      .register(`./sw.js?v=${OFFLINE_CACHE_VERSION}`)
+      .then((registration) => {
+        if (registration.waiting) {
+          waitingServiceWorker = registration.waiting;
+          shouldReloadForUpdate = true;
+          updateAppChrome();
+        }
+
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener("statechange", () => {
+            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+              waitingServiceWorker = newWorker;
+              shouldReloadForUpdate = true;
+              updateAppChrome();
+            }
+          });
+        });
+
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (!shouldReloadForUpdate) return;
+          shouldReloadForUpdate = false;
+          window.location.reload();
+        });
+      })
+      .catch((error) => {
+        console.error("Service worker registration failed", error);
+      });
   });
 }
 
@@ -2733,7 +2844,14 @@ canvas.addEventListener("pointerdown", (event) => {
 });
 
 installAudioUnlock();
+initAppExperience();
 registerOfflineSupport();
+
+if (launchParams.get("action") === "start") {
+  startGame();
+} else if (launchParams.get("action") === "offline") {
+  setOverlay("離線模式就緒", "照樣能玩", "核心內容已快取，沒有網路也能直接開局。", "開始");
+}
 
 window.__gameDebug = {
   getSnapshot() {

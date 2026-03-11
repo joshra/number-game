@@ -2,17 +2,35 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="application-name" content="Number Gate Rush" />
     <meta name="theme-color" content="#14213d" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Number Gate Rush" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
     <title>Number Gate Rush: 打怪救寶物</title>
-    <link rel="manifest" href="./manifest.webmanifest?v=20260311-170739" />
+    <link rel="manifest" href="./manifest.webmanifest?v=20260311-182500" />
     <link rel="icon" href="./icons/icon-192.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./icons/icon-192.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260311-170739" />
+    <link rel="stylesheet" href="./styles.css?v=20260311-182500" />
   </head>
   <body>
+    <div class="app-chrome" aria-live="polite">
+      <div class="app-chrome__identity">
+        <span class="app-chrome__dot"></span>
+        <div>
+          <strong>Number Gate Rush</strong>
+          <p id="app-mode-label">瀏覽器模式</p>
+        </div>
+      </div>
+      <div class="app-chrome__actions">
+        <span id="network-status" class="status-pill">連線中</span>
+        <button id="install-button" class="secondary-button" type="button" hidden>安裝 App</button>
+        <button id="update-button" class="secondary-button" type="button" hidden>更新內容</button>
+      </div>
+    </div>
     <main class="app-shell">
       <section class="panel intro-panel">
         <p class="eyebrow">Arcade Prototype</p>
@@ -101,6 +119,6 @@
       </section>
     </main>
 
-    <script src="./game.js?v=20260311-170739"></script>
+    <script src="./game.js?v=20260311-182500"></script>
   </body>
 </html>
