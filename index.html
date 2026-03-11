@@ -25,6 +25,9 @@
           <span><kbd>↑</kbd> 大絕招</span>
           <span><kbd>Space</kbd> 重開</span>
         </div>
+        <p class="device-note">
+          手機可直接點畫面左右半邊切換跑道，或用下方大按鈕操作；平板與電腦可搭配鍵盤。
+        </p>
         <button id="start-button" class="primary-button">開始遊戲</button>
       </section>
 
@@ -60,23 +63,34 @@
           </div>
         </header>
 
-        <div class="game-frame">
-          <canvas id="game" width="420" height="720" aria-label="Number Gate Rush"></canvas>
-          <div id="overlay" class="overlay">
-            <div class="overlay-card">
-              <p id="overlay-kicker" class="overlay-kicker">小砲台準備好了</p>
-              <h2 id="overlay-title">打小怪獸，接住好寶物</h2>
-              <p id="overlay-text">
-                小砲台會自動發射。打爆寶物方塊才會讓玩具元素砲變身，像火焰、雷射、冰霜和毒泡；漏掉只是沒拿到，但任何小怪獸跑過終點，這局就結束。
-              </p>
-              <button id="restart-button" class="primary-button">開始</button>
+        <div class="play-area">
+          <div class="game-frame">
+            <canvas id="game" width="420" height="720" aria-label="Number Gate Rush"></canvas>
+            <div id="overlay" class="overlay">
+              <div class="overlay-card">
+                <p id="overlay-kicker" class="overlay-kicker">小砲台準備好了</p>
+                <h2 id="overlay-title">打小怪獸，接住好寶物</h2>
+                <p id="overlay-text">
+                  小砲台會自動發射。打爆寶物方塊才會讓玩具元素砲變身，像火焰、雷射、冰霜和毒泡；漏掉只是沒拿到，但任何小怪獸跑過終點，這局就結束。
+                </p>
+                <button id="restart-button" class="primary-button">開始</button>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="touch-controls" aria-label="Touch controls">
-          <button id="left-button" class="touch-button" type="button">往左</button>
-          <button id="right-button" class="touch-button" type="button">往右</button>
-          <button id="ultimate-button" class="touch-button ultimate-button" type="button">大絕</button>
+          <div class="touch-controls" aria-label="Touch controls">
+            <button id="left-button" class="touch-button" type="button" aria-label="往左移動">
+              <span class="touch-title">往左</span>
+              <span class="touch-hint">左半邊</span>
+            </button>
+            <button id="ultimate-button" class="touch-button ultimate-button" type="button" aria-label="施放大絕">
+              <span class="touch-title">大絕</span>
+              <span class="touch-hint">電量滿就放</span>
+            </button>
+            <button id="right-button" class="touch-button" type="button" aria-label="往右移動">
+              <span class="touch-title">往右</span>
+              <span class="touch-hint">右半邊</span>
+            </button>
+          </div>
         </div>
       </section>
     </main>
