@@ -1,15 +1,15 @@
-const CACHE_NAME = "number-gate-rush-20260311-183954";
+const CACHE_NAME = "number-gate-rush-20260311-195531";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./index.html?source=pwa",
   "./index.html?action=start",
   "./index.html?action=offline",
-  "./styles.css?v=20260311-183954",
-  "./game.js?v=20260311-183954",
-  "./manifest.webmanifest?v=20260311-183954",
-  "./icons/icon-192.svg?v=20260311-183954",
-  "./icons/icon-512.svg?v=20260311-183954",
+  "./styles.css?v=20260311-195531",
+  "./game.js?v=20260311-195531",
+  "./manifest.webmanifest?v=20260311-195531",
+  "./icons/icon-192.svg?v=20260311-195531",
+  "./icons/icon-512.svg?v=20260311-195531",
 ];
 
 function isNavigationRequest(request) {

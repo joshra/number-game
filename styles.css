@@ -698,6 +698,61 @@ canvas {
   }
 }
 
+@media (max-width: 430px) and (min-height: 840px) {
+  :root {
+    --mobile-chrome-height: 42px;
+  }
+
+  .app-shell {
+    gap: 12px;
+    padding: 8px 0 max(12px, env(safe-area-inset-bottom));
+  }
+
+  .game-panel {
+    padding: 12px;
+    gap: 10px;
+    min-height: calc(100dvh - var(--mobile-chrome-height) - 16px - env(safe-area-inset-bottom));
+  }
+
+  .play-area {
+    gap: 8px;
+    min-height: 100%;
+  }
+
+  .game-frame {
+    width: min(100%, calc((100dvh - 162px) * 7 / 12));
+    height: 100%;
+    border-radius: 20px;
+  }
+
+  .touch-controls {
+    gap: 8px;
+  }
+
+  .touch-button {
+    min-height: 52px;
+    padding: 7px 6px;
+    border-radius: 16px;
+  }
+
+  .hud {
+    gap: 6px;
+  }
+
+  .hud-block {
+    padding: 8px 10px;
+  }
+
+  .hud-label {
+    margin-bottom: 4px;
+    font-size: 0.66rem;
+  }
+
+  .hud-block strong {
+    font-size: 0.9rem;
+  }
+}
+
 @media (pointer: fine) and (min-width: 961px) {
   .touch-controls {
     position: sticky;
