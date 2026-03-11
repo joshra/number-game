@@ -10,5 +10,6 @@ Original prompt: 確保在手機、平板和電腦上容易操作
 - 2026-03-11: Expanded desktop layout to use wider screens more effectively with a larger game column, broader HUD grid, and taller desktop control tiles.
 - 2026-03-11: Added offline-play support with a web app manifest, service worker registration, and precache entries for core local assets.
 - 2026-03-11: Upgraded the PWA toward app-like behavior with standalone/fullscreen display hints, install/update controls, safe-area app chrome, shortcut launch params, and navigation-aware service worker fallbacks.
+- 2026-03-11: Replaced the PWA home-screen icon artwork with a monster-themed launcher icon and bumped asset cache versions so mobile shortcuts refresh to the new image.
 - TODO: When future art/audio files are added, include them in `sw.js` precache or switch to a generated asset manifest to avoid stale offline bundles.
 - TODO: Replace the SVG-only icons with dedicated maskable PNG assets if this app is distributed more broadly; some Android launchers still render PNG maskables more consistently.
