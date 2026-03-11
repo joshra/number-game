@@ -13,5 +13,6 @@ Original prompt: 確保在手機、平板和電腦上容易操作
 - 2026-03-11: Replaced the PWA home-screen icon artwork with a monster-themed launcher icon and bumped asset cache versions so mobile shortcuts refresh to the new image.
 - 2026-03-11: Compressed the mobile/tablet app status bar with tighter padding, smaller pills, and a lower standalone offset so it stops crowding the play area.
 - 2026-03-11: Switched handheld game sizing to `dvh`-based heights and tightened mobile HUD/touch-control spacing so the full playfield fits within mainstream phone and tablet viewports more reliably.
+- 2026-03-11: Reworked the phone layout so `game-panel` and `play-area` fill the handheld viewport directly, with the game frame expanding to the remaining height instead of sitting inside a smaller fixed-height block.
 - TODO: When future art/audio files are added, include them in `sw.js` precache or switch to a generated asset manifest to avoid stale offline bundles.
 - TODO: Replace the SVG-only icons with dedicated maskable PNG assets if this app is distributed more broadly; some Android launchers still render PNG maskables more consistently.
