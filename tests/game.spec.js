@@ -76,3 +76,25 @@ test("breaking a block clears old bullets and advances the row", async ({ page }
   const advanced = await getSnapshot(page);
   expect(advanced.transitionClears).toBeGreaterThan(initialTransitionClears);
 });
+
+test("ultimate button exposes cooldown progress and ready state", async ({ page }) => {
+  await startGame(page);
+
+  const cooldown = page.locator("#ultimate-cooldown");
+  const button = page.locator("#ultimate-button");
+  const hudValue = page.locator("#ultimate-value");
+
+  await expect(cooldown).toHaveText("還要 100%");
+  await expect(hudValue).toHaveText("還要 100%");
+  await expect(button).toBeDisabled();
+  await expect(button).toHaveAttribute("data-ready", "false");
+
+  await page.evaluate(() => {
+    window.__gameDebug.setUltimateChargeForTest(100);
+  });
+
+  await expect(cooldown).toHaveText("READY!");
+  await expect(hudValue).toHaveText("READY!");
+  await expect(button).toBeEnabled();
+  await expect(button).toHaveAttribute("data-ready", "true");
+});

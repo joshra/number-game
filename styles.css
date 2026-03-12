@@ -378,6 +378,9 @@ canvas {
 
 .touch-button {
   appearance: none;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -413,12 +416,88 @@ canvas {
 }
 
 .ultimate-button {
+  --ultimate-progress: 0%;
   background: linear-gradient(180deg, #fb923c, #ef4444);
   color: #fff7ed;
+  border-color: rgba(255, 247, 237, 0.2);
+  box-shadow:
+    0 14px 30px rgba(190, 24, 93, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.ultimate-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(180deg, rgba(255, 251, 235, 0.28), transparent 34%),
+    linear-gradient(0deg, rgba(120, 18, 46, 0.9) 0%, rgba(225, 29, 72, 0.88) var(--ultimate-progress), rgba(255, 255, 255, 0.08) var(--ultimate-progress), rgba(255, 255, 255, 0.04) 100%);
+  transition: background 180ms ease;
+}
+
+.ultimate-button::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 18px;
+  border: 2px solid rgba(255, 247, 237, 0.16);
+  box-shadow: inset 0 0 0 999px rgba(255, 255, 255, 0.02);
+  transition: box-shadow 180ms ease, border-color 180ms ease;
 }
 
 .ultimate-button .touch-hint {
   color: rgba(255, 247, 237, 0.84);
+}
+
+.touch-title,
+.touch-cooldown,
+.touch-hint {
+  position: relative;
+  z-index: 1;
+}
+
+.touch-cooldown {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 10px rgba(120, 18, 46, 0.28);
+}
+
+.ultimate-button[data-ready="true"] {
+  box-shadow:
+    0 18px 34px rgba(190, 24, 93, 0.28),
+    0 0 0 3px rgba(254, 240, 138, 0.22);
+}
+
+.ultimate-button[data-ready="true"]::after {
+  border-color: rgba(254, 240, 138, 0.92);
+  box-shadow:
+    inset 0 0 0 999px rgba(255, 251, 235, 0.08),
+    0 0 0 6px rgba(254, 240, 138, 0.16);
+  animation: ultimatePulse 1s ease-in-out infinite;
+}
+
+.ultimate-button:disabled {
+  cursor: not-allowed;
+}
+
+@keyframes ultimatePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      inset 0 0 0 999px rgba(255, 251, 235, 0.08),
+      0 0 0 4px rgba(254, 240, 138, 0.1);
+  }
+
+  50% {
+    transform: scale(1.02);
+    box-shadow:
+      inset 0 0 0 999px rgba(255, 251, 235, 0.16),
+      0 0 0 8px rgba(254, 240, 138, 0.24);
+  }
 }
 
 @media (min-width: 1280px) {

@@ -6,6 +6,8 @@ const restartButton = document.getElementById("restart-button");
 const leftButton = document.getElementById("left-button");
 const rightButton = document.getElementById("right-button");
 const ultimateButton = document.getElementById("ultimate-button");
+const ultimateCooldown = document.getElementById("ultimate-cooldown");
+const ultimateHintLabel = ultimateButton?.querySelector(".touch-hint") ?? null;
 const overlay = document.getElementById("overlay");
 const overlayKicker = document.getElementById("overlay-kicker");
 const overlayTitle = document.getElementById("overlay-title");
@@ -21,7 +23,7 @@ const appModeLabel = document.getElementById("app-mode-label");
 const networkStatus = document.getElementById("network-status");
 const installButton = document.getElementById("install-button");
 const updateButton = document.getElementById("update-button");
-const OFFLINE_CACHE_VERSION = "20260311-195531";
+const OFFLINE_CACHE_VERSION = "20260312-132800";
 const launchParams = new URLSearchParams(window.location.search);
 let deferredInstallPrompt = null;
 let waitingServiceWorker = null;
@@ -843,6 +845,14 @@ function canUseUltimate() {
   return state.ultimateCharge >= ULTIMATE_EMERGENCY_THRESHOLD && getDangerActive();
 }
 
+function getUltimateProgress() {
+  return Math.max(0, Math.min(ULTIMATE_MAX, state.ultimateCharge));
+}
+
+function getUltimateChargeRemaining() {
+  return Math.max(0, ULTIMATE_MAX - getUltimateProgress());
+}
+
 function triggerScreenShake(frames, power) {
   state.shakeFrames = Math.max(state.shakeFrames, frames);
   state.shakePower = Math.max(state.shakePower, power);
@@ -859,14 +869,30 @@ function activateTreasureRush(x = W / 2, y = PLAYER_COLLISION_Y - 80) {
 }
 
 function updateHud() {
+  const ultimateProgress = getUltimateProgress();
+  const ultimateRemaining = getUltimateChargeRemaining();
+  const ultimateReady = canUseUltimate();
   scoreValue.textContent = `${state.troop}`;
   const stage = state.bossActive ? TOTAL_ROWS : Math.min(state.rowsCompleted + 1, TOTAL_ROWS);
   stageValue.textContent = `${stage} / ${TOTAL_ROWS}`;
   hintValue.textContent = getCurrentHint();
   comboValue.textContent = `${state.combo}`;
   boostValue.textContent = getWeaponTitle();
-  ultimateValue.textContent = canUseUltimate() ? "READY!" : `${state.ultimateCharge}%`;
-  if (ultimateButton) ultimateButton.disabled = !canUseUltimate();
+  ultimateValue.textContent = ultimateReady ? "READY!" : `還要 ${ultimateRemaining}%`;
+  if (ultimateButton) {
+    ultimateButton.disabled = !ultimateReady;
+    ultimateButton.dataset.ready = ultimateReady ? "true" : "false";
+    ultimateButton.style.setProperty("--ultimate-progress", `${ultimateProgress}%`);
+  }
+  if (ultimateCooldown) {
+    ultimateCooldown.textContent = ultimateReady ? "READY!" : `還要 ${ultimateRemaining}%`;
+  }
+  const hint = ultimateReady
+    ? "現在可施放"
+    : ultimateProgress >= ULTIMATE_EMERGENCY_THRESHOLD
+      ? "危急時可提前放"
+      : `已充能 ${ultimateProgress}%`;
+  if (ultimateHintLabel) ultimateHintLabel.textContent = hint;
 }
 
 function spawnBullet() {
@@ -2862,6 +2888,8 @@ window.__gameDebug = {
       rowsCompleted: state.rowsCompleted,
       currentLane: state.currentLane,
       bulletCount: state.bullets.length,
+      ultimateCharge: state.ultimateCharge,
+      canUseUltimate: canUseUltimate(),
       transitionClears: state.transitionClears,
       bossActive: state.bossActive,
       currentRow: state.currentRow
@@ -2912,6 +2940,10 @@ window.__gameDebug = {
     state.currentRowResolved = false;
     state.bullets = [];
     state.fireCooldown = 0;
+    updateHud();
+  },
+  setUltimateChargeForTest(value) {
+    state.ultimateCharge = Math.max(0, Math.min(ULTIMATE_MAX, value));
     updateHud();
   },
 };
