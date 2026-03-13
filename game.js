@@ -14,6 +14,7 @@ const overlayTitle = document.getElementById("overlay-title");
 const overlayText = document.getElementById("overlay-text");
 const scoreValue = document.getElementById("score-value");
 const stageValue = document.getElementById("stage-value");
+const chapterValue = document.getElementById("chapter-value");
 const hintValue = document.getElementById("hint-value");
 const comboValue = document.getElementById("combo-value");
 const boostValue = document.getElementById("boost-value");
@@ -23,7 +24,7 @@ const appModeLabel = document.getElementById("app-mode-label");
 const networkStatus = document.getElementById("network-status");
 const installButton = document.getElementById("install-button");
 const updateButton = document.getElementById("update-button");
-const OFFLINE_CACHE_VERSION = "20260312-132800";
+const OFFLINE_CACHE_VERSION = "20260313-100622";
 const launchParams = new URLSearchParams(window.location.search);
 let deferredInstallPrompt = null;
 let waitingServiceWorker = null;
@@ -37,21 +38,22 @@ const BLOCK_HEIGHT = 88;
 const HALF_BLOCK_HEIGHT = BLOCK_HEIGHT / 2;
 const PLAYER_Y = H - 110;
 const PLAYER_COLLISION_Y = PLAYER_Y - 4;
-const TOTAL_ROWS = 20;
-const ROW_SPEED = 2.35;
+const STAGES_PER_ARC = 20;
+const TOTAL_ROWS = 100;
+const ROW_SPEED = 2.2;
 const ROW_START_Y = -70;
 const PREVIEW_Y = 128;
 const BULLET_SPEED = 11;
-const FIRE_INTERVAL = 8;
-const BULLET_DAMAGE = 3;
+const FIRE_INTERVAL = 7;
+const BULLET_DAMAGE = 4;
 const MISS_PENALTY = 10;
-const COMBO_REWARD = 8;
+const COMBO_REWARD = 10;
 const BOSS_REWARD = { type: "mul", value: 2 };
 const RAPID_FIRE_DURATION = 320;
 const POWER_SHOT_DURATION = 220;
 const ELEMENT_DURATION = 260;
 const ULTIMATE_MAX = 100;
-const ULTIMATE_EMERGENCY_THRESHOLD = 45;
+const ULTIMATE_EMERGENCY_THRESHOLD = 40;
 const TREASURE_RUSH_DURATION = 240;
 const FACTION_NAME = "小砲台";
 const ITEM_NAME = "寶物方塊";
@@ -121,12 +123,254 @@ const CRYSTAL_COLORS = {
   blue: { fill: "#3b82f6", deep: "#1d4ed8" },
   red: { fill: "#ef4444", deep: "#991b1b" },
 };
-const STAGE_THEMES = [
-  { name: "糖果草原", rewardBias: 2, mulBias: 0.02, perkBias: 0.02, enemyBias: "runner" },
-  { name: "流星夜空", rewardBias: 3, mulBias: 0.08, perkBias: 0.05, enemyBias: "flyer" },
-  { name: "火山寶窟", rewardBias: 5, mulBias: 0.06, perkBias: 0.08, enemyBias: "tank" },
-  { name: "彩虹風暴", rewardBias: 4, mulBias: 0.1, perkBias: 0.1, enemyBias: "blob" },
+const STORY_ARCS = [
+  {
+    id: "meadow",
+    layer: 1,
+    name: "晨霧田野",
+    weaponName: "曙光彈弓",
+    weaponMode: "normal",
+    rewardBias: 2,
+    mulBias: 0.02,
+    perkBias: 0.02,
+    enemyBias: "runner",
+    palette: {
+      skyTop: "#fde68a",
+      skyBottom: "#bbf7d0",
+      haze: "rgba(255,255,255,0.28)",
+      road: "rgba(120, 113, 108, 0.26)",
+      lane: "rgba(255,255,255,0.55)",
+      accent: "#f59e0b",
+      accentSoft: "rgba(245,158,11,0.18)",
+    },
+  },
+  {
+    id: "harbor",
+    layer: 2,
+    name: "潮音港灣",
+    weaponName: "潮汐連弩",
+    weaponMode: "rapid",
+    rewardBias: 3,
+    mulBias: 0.05,
+    perkBias: 0.05,
+    enemyBias: "flyer",
+    palette: {
+      skyTop: "#93c5fd",
+      skyBottom: "#67e8f9",
+      haze: "rgba(255,255,255,0.24)",
+      road: "rgba(15, 23, 42, 0.26)",
+      lane: "rgba(224,242,254,0.72)",
+      accent: "#0ea5e9",
+      accentSoft: "rgba(14,165,233,0.18)",
+    },
+  },
+  {
+    id: "rift",
+    layer: 3,
+    name: "熔核裂谷",
+    weaponName: "熔核破城砲",
+    weaponMode: "fire",
+    rewardBias: 5,
+    mulBias: 0.06,
+    perkBias: 0.08,
+    enemyBias: "tank",
+    palette: {
+      skyTop: "#fb923c",
+      skyBottom: "#7f1d1d",
+      haze: "rgba(255,220,180,0.16)",
+      road: "rgba(41, 37, 36, 0.35)",
+      lane: "rgba(254,240,138,0.62)",
+      accent: "#ef4444",
+      accentSoft: "rgba(239,68,68,0.22)",
+    },
+  },
+  {
+    id: "observatory",
+    layer: 4,
+    name: "極光觀測站",
+    weaponName: "極光折射槍",
+    weaponMode: "laser",
+    rewardBias: 4,
+    mulBias: 0.1,
+    perkBias: 0.1,
+    enemyBias: "blob",
+    palette: {
+      skyTop: "#1d4ed8",
+      skyBottom: "#312e81",
+      haze: "rgba(191,219,254,0.14)",
+      road: "rgba(15, 23, 42, 0.28)",
+      lane: "rgba(219,234,254,0.68)",
+      accent: "#22d3ee",
+      accentSoft: "rgba(34,211,238,0.18)",
+    },
+  },
+  {
+    id: "skyforge",
+    layer: 5,
+    name: "龍脈天穹",
+    weaponName: "龍脈時序炮",
+    weaponMode: "power",
+    rewardBias: 6,
+    mulBias: 0.12,
+    perkBias: 0.12,
+    enemyBias: "tank",
+    palette: {
+      skyTop: "#111827",
+      skyBottom: "#6d28d9",
+      haze: "rgba(216,180,254,0.14)",
+      road: "rgba(30, 41, 59, 0.3)",
+      lane: "rgba(233,213,255,0.62)",
+      accent: "#f472b6",
+      accentSoft: "rgba(244,114,182,0.18)",
+    },
+  },
 ];
+
+const BOSS_PROFILES = [
+  {
+    name: "稻浪巨偶",
+    title: "晨霧田野守門獸",
+    abilityText: "會突然衝鋒壓線",
+    intro: "晨霧田野的核心守衛甦醒了，注意它的衝鋒節奏。",
+    defeat: "晨霧田野重新亮起，第一枚數字核心回到中央塔。",
+    hp: 74,
+    speedMultiplier: 1,
+    breachDamage: 12,
+    reward: { type: "mul", value: 1.8 },
+    bodyColor: "#365314",
+    accentColor: "#fde68a",
+    glowColor: "rgba(253,230,138,0.24)",
+    abilityType: "charge",
+    armor: 1,
+    dashInterval: 136,
+    dashDuration: 18,
+  },
+  {
+    name: "潮鐘海蛇",
+    title: "潮音港灣深海王",
+    abilityText: "會生成護盾吃掉前排火力",
+    intro: "潮音港灣的深海王盤起潮盾，必須先拆掉它的外殼。",
+    defeat: "港灣警鐘安靜下來，第二枚數字核心已回收。",
+    hp: 92,
+    speedMultiplier: 0.88,
+    breachDamage: 13,
+    reward: { type: "mul", value: 1.9 },
+    bodyColor: "#0f172a",
+    accentColor: "#67e8f9",
+    glowColor: "rgba(103,232,249,0.24)",
+    abilityType: "shield",
+    armor: 1,
+    shieldCooldownMax: 180,
+    shieldStrength: 14,
+  },
+  {
+    name: "熔核甲王",
+    title: "熔核裂谷鍛爐主",
+    abilityText: "自帶高護甲，火焰傷害較難燒穿",
+    intro: "裂谷鍛爐主全身包著熔殼，正面火力要更扎實。",
+    defeat: "熔核裂谷的火脈穩定下來，第三枚數字核心已收復。",
+    hp: 110,
+    speedMultiplier: 0.8,
+    breachDamage: 15,
+    reward: { type: "mul", value: 2 },
+    bodyColor: "#7f1d1d",
+    accentColor: "#fb923c",
+    glowColor: "rgba(251,146,60,0.26)",
+    abilityType: "armor",
+    armor: 2,
+    burnResist: 1,
+  },
+  {
+    name: "極光鏡后",
+    title: "極光觀測站棱鏡主腦",
+    abilityText: "會左右漂移，雷射對她傷害較低",
+    intro: "極光鏡后展開折射軌道，射線必須跟上她的漂移。",
+    defeat: "觀測站的天幕恢復穩定，第四枚數字核心已同步返航。",
+    hp: 102,
+    speedMultiplier: 0.92,
+    breachDamage: 15,
+    reward: { type: "mul", value: 2.1 },
+    bodyColor: "#312e81",
+    accentColor: "#22d3ee",
+    glowColor: "rgba(34,211,238,0.24)",
+    abilityType: "sway",
+    armor: 1,
+    swayAmplitude: 54,
+    laserResist: 0.3,
+  },
+  {
+    name: "龍脈裂界龍",
+    title: "龍脈天穹最終王",
+    abilityText: "會輪流衝鋒與展盾，是五層裡最硬的一隻",
+    intro: "最終裂界龍從天穹俯衝而下，這一層不會再有退路。",
+    defeat: "五枚數字核心全數回歸，星弧王國的裂縫被你關上了。",
+    hp: 138,
+    speedMultiplier: 0.9,
+    breachDamage: 18,
+    reward: { type: "mul", value: 2.4 },
+    bodyColor: "#111827",
+    accentColor: "#f472b6",
+    glowColor: "rgba(244,114,182,0.26)",
+    abilityType: "hybrid",
+    armor: 2,
+    dashInterval: 148,
+    dashDuration: 18,
+    shieldCooldownMax: 164,
+    shieldStrength: 14,
+  },
+];
+
+const LAYER_STAGE_BLUEPRINTS = [
+  { title: "前線集結", objective: "先收回前哨晶核", rowType: "single", lane: 0 },
+  { title: "雙塔校準", objective: "左右兩線的節奏開始錯位", rowType: "single", lane: 1 },
+  { title: "伏擊試探", objective: "先清高速敵，再回收高值晶塊", rowType: "mixed", enemyLane: 0, perk: "rapid" },
+  { title: "守門壓力", objective: "雙線敵群開始同步施壓", rowType: "doubleEnemy", forcedEnemy: ["runner", "blob"] },
+  { title: "武裝熱身", objective: "新武器剛完成校正，測試壓制力", rowType: "enemy", lane: 0, forcedEnemy: "flyer" },
+  { title: "補給寶庫", objective: "兩側補給同時下沉，選收益更高的一邊", rowType: "dual", perkHigh: "laser" },
+  { title: "橋口攔截", objective: "裂隙同時吐出敵群與補給", rowType: "mixed", enemyLane: 1, forcedEnemy: "flyer", perk: "rapid" },
+  { title: "精英警號", objective: "本層精英開始測你的輸出極限", rowType: "elite", forcedEnemy: "tank" },
+  { title: "重裝前哨", objective: "硬殼怪開始正面衝撞防線", rowType: "enemy", lane: 1, forcedEnemy: "tank" },
+  { title: "核心倉列", objective: "這一段是本層最肥的一波", rowType: "jackpot" },
+  { title: "交叉火線", objective: "先扛住坦怪，再拿武器模組", rowType: "gauntlet", forcedEnemy: "tank", perk: "fire" },
+  { title: "封門衝陣", objective: "這一關不會給你第二次機會", rowType: "doubleEnemy", forcedEnemy: ["tank", "runner"] },
+  { title: "再啟動", objective: "本層戰區轉入中段，敵群速度提升", rowType: "single", lane: 0, perk: "laser" },
+  { title: "空域壓制", objective: "飛行精英會從高空俯衝", rowType: "elite", forcedEnemy: "flyer" },
+  { title: "資料庫走廊", objective: "雙側晶核一起掉落，搶下高倍率", rowType: "jackpot", perkHigh: "ice" },
+  { title: "極限拖延", objective: "敵人開始用慢速與毒蝕拖你節奏", rowType: "gauntlet", forcedEnemy: "blob", perk: "ice" },
+  { title: "終段預熱", objective: "最後四關前先撐住第一波", rowType: "enemy", lane: 0, forcedEnemy: "runner", perk: "power" },
+  { title: "裂冠雙襲", objective: "雙線敵軍同時俯衝，別讓任一邊穿線", rowType: "doubleEnemy", forcedEnemy: ["flyer", "runner"] },
+  { title: "王座前庫", objective: "決戰前的寶藏走廊藏著最後火力", rowType: "jackpot", perkHigh: "power" },
+  { title: "守層終戰", objective: "拿回本層數字核心，擊破守門獸", rowType: "gauntlet", forcedEnemy: "tank", elite: true, perk: "power" },
+];
+
+function buildLevelScripts() {
+  const scripts = [];
+  for (const arc of STORY_ARCS) {
+    for (let stageIndex = 0; stageIndex < STAGES_PER_ARC; stageIndex += 1) {
+      const blueprint = LAYER_STAGE_BLUEPRINTS[stageIndex];
+      const stageNumber = stageIndex + 1;
+      scripts.push({
+        ...blueprint,
+        title: `${arc.name}${stageNumber.toString().padStart(2, "0")}・${blueprint.title}`,
+        objective:
+          stageNumber === STAGES_PER_ARC
+            ? `收回${arc.name}的數字核心，守住第 ${arc.layer} 層的終戰防線`
+            : `${arc.name}第 ${stageNumber} 關：${blueprint.objective}`,
+        perk:
+          stageNumber === 1 && arc.weaponMode !== "normal"
+            ? arc.weaponMode
+            : blueprint.perk ?? null,
+        perkHigh:
+          stageNumber === 6 && arc.weaponMode !== "normal"
+            ? arc.weaponMode
+            : blueprint.perkHigh ?? null,
+      });
+    }
+  }
+  return scripts;
+}
+
+const LEVEL_SCRIPTS = buildLevelScripts();
 
 const HINTS = [
   `${ENEMY_NAME}突破就直接輸，${ITEM_NAME}漏掉只是少賺`,
@@ -491,8 +735,42 @@ function randomChoice(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-function getStageTheme(index) {
-  return STAGE_THEMES[Math.min(STAGE_THEMES.length - 1, Math.floor(index / 5))];
+function getStoryArc(index) {
+  return STORY_ARCS[Math.min(STORY_ARCS.length - 1, Math.floor(index / STAGES_PER_ARC))];
+}
+
+function getLevelScript(index) {
+  return LEVEL_SCRIPTS[Math.min(LEVEL_SCRIPTS.length - 1, index)];
+}
+
+function getCurrentStageIndex() {
+  if (state.bossActive && state.rowsCompleted > 0) return Math.min(TOTAL_ROWS - 1, state.rowsCompleted - 1);
+  return Math.min(TOTAL_ROWS - 1, state.rowsCompleted);
+}
+
+function getCurrentStageInArc() {
+  return state.bossActive ? STAGES_PER_ARC : (getCurrentStageIndex() % STAGES_PER_ARC) + 1;
+}
+
+function getCurrentStoryArc() {
+  return getStoryArc(getCurrentStageIndex());
+}
+
+function getCurrentLevelScript() {
+  return getLevelScript(getCurrentStageIndex());
+}
+
+function getArcProgress(index) {
+  return (index % STAGES_PER_ARC) / (STAGES_PER_ARC - 1);
+}
+
+function getBaseWeaponMode() {
+  return getCurrentStoryArc().weaponMode;
+}
+
+function getChapterLabel() {
+  const arc = getCurrentStoryArc();
+  return `第 ${arc.layer} 層 ${arc.name}`;
 }
 
 function loadBestProgress() {
@@ -514,29 +792,36 @@ function persistBestProgress() {
   }
 }
 
-function createReward(depth, highValue = false, theme = getStageTheme(depth)) {
+function createReward(depth, highValue = false, theme = getStoryArc(depth)) {
+  const arcProgress = getArcProgress(depth);
   if (highValue) {
     if (Math.random() < 0.55 + theme.mulBias) {
-      return { type: "mul", value: Number((1.7 + depth * 0.025 + Math.random() * 0.35 + theme.mulBias).toFixed(1)) };
+      return {
+        type: "mul",
+        value: Number((1.62 + theme.layer * 0.08 + arcProgress * 0.2 + Math.random() * 0.22 + theme.mulBias).toFixed(1)),
+      };
     }
-    return { type: "add", value: 10 + depth + theme.rewardBias + Math.floor(Math.random() * 8) };
+    return { type: "add", value: 11 + theme.layer * 3 + Math.floor(arcProgress * 8) + theme.rewardBias + Math.floor(Math.random() * 6) };
   }
 
   if (Math.random() < 0.22 + theme.mulBias * 0.5) {
-    return { type: "mul", value: Number((1.25 + depth * 0.018 + Math.random() * 0.24 + theme.mulBias * 0.5).toFixed(1)) };
+    return {
+      type: "mul",
+      value: Number((1.2 + theme.layer * 0.05 + arcProgress * 0.12 + Math.random() * 0.18 + theme.mulBias * 0.4).toFixed(1)),
+    };
   }
-  return { type: "add", value: 5 + theme.rewardBias + Math.floor(depth * 0.8) + Math.floor(Math.random() * 6) };
+  return { type: "add", value: 6 + theme.rewardBias + theme.layer * 2 + Math.floor(arcProgress * 6) + Math.floor(Math.random() * 5) };
 }
 
-function createPerk(depth, highValue = false, theme = getStageTheme(depth)) {
+function createPerk(depth, highValue = false, theme = getStoryArc(depth)) {
   const roll = Math.random();
   if (highValue && roll < 0.15 + theme.perkBias) return "laser";
   if (highValue && roll < 0.29 + theme.perkBias) return "power";
   if (highValue && roll < 0.43 + theme.perkBias) return "fire";
-  if (roll < 0.06 + depth * 0.005) return "shield";
-  if (roll < 0.11 + depth * 0.008 + theme.perkBias * 0.5) return "rapid";
-  if (roll < 0.15 + depth * 0.008 + theme.perkBias * 0.6) return "ice";
-  if (roll < 0.19 + depth * 0.009 + theme.perkBias * 0.8) return "poison";
+  if (roll < 0.08 + theme.layer * 0.01) return "shield";
+  if (roll < 0.14 + theme.layer * 0.015 + theme.perkBias * 0.5) return "rapid";
+  if (roll < 0.19 + theme.layer * 0.016 + theme.perkBias * 0.6) return "ice";
+  if (roll < 0.24 + theme.layer * 0.016 + theme.perkBias * 0.8) return "poison";
   return null;
 }
 
@@ -598,7 +883,8 @@ function createItemBlock(lane, hp, reward, options = {}) {
 }
 
 function createEnemyBlock(index, lane, options = {}) {
-  const { preferFast = false, forcedType = null, elite = false, theme = getStageTheme(index) } = options;
+  const { preferFast = false, forcedType = null, elite = false, theme = getStoryArc(index) } = options;
+  const arcProgress = getArcProgress(index);
   const pool =
     index < 4
       ? ["runner", "runner", "blob"]
@@ -607,8 +893,8 @@ function createEnemyBlock(index, lane, options = {}) {
         : ["runner", "blob", "tank", "flyer", theme.enemyBias];
   const enemyType = forcedType ?? randomChoice(pool);
   const enemyStats = ENEMY_TYPES[enemyType];
-  const baseHp = 7 + Math.floor(index * 0.8) + Math.floor(Math.random() * 4);
-  const hp = Math.max(4, Math.round(baseHp * enemyStats.hpScale * (elite ? 1.8 : 1)));
+  const baseHp = 6 + theme.layer * 2 + Math.floor(arcProgress * 8) + Math.floor(Math.random() * 3);
+  const hp = Math.max(4, Math.round(baseHp * enemyStats.hpScale * (elite ? 1.45 : 1)));
   const enemy = createBlock(lane, hp, { type: "add", value: 0 }, "enemy");
   enemy.enemyType = enemyType;
   enemy.enemyStats = enemyStats;
@@ -617,164 +903,215 @@ function createEnemyBlock(index, lane, options = {}) {
   return enemy;
 }
 
-function createSingleRow(index, lane) {
-  const theme = getStageTheme(index);
-  const easyHp = 6 + Math.floor(index * 0.75);
+function describeStage(index, fallback) {
+  const arc = getStoryArc(index);
+  const script = getLevelScript(index);
+  return `${arc.name}・${script.title}：${script.objective || fallback}`;
+}
+
+function createSingleRow(index, lane, options = {}) {
+  const theme = getStoryArc(index);
+  const script = getLevelScript(index);
+  const arcProgress = getArcProgress(index);
+  const easyHp = 5 + theme.layer + Math.floor(arcProgress * 7);
   const reward = createReward(index, false, theme);
   const block = createItemBlock(lane, easyHp, reward, { big: reward.value >= 8 });
-  block.perk = createPerk(index, false, theme);
+  block.perk = options.perk ?? createPerk(index, false, theme);
   return {
     index,
-    hint: `${theme.name}：${randomChoice(HINTS)}`,
+    hint: describeStage(index, `${theme.name}的第一批補給到了`),
+    storyTitle: script.title,
     blocks: [block],
   };
 }
 
-function createDualRow(index) {
-  const theme = getStageTheme(index);
+function createDualRow(index, options = {}) {
+  const theme = getStoryArc(index);
+  const script = getLevelScript(index);
+  const arcProgress = getArcProgress(index);
   const lowLane = Math.random() < 0.5 ? 0 : 1;
   const highLane = lowLane === 0 ? 1 : 0;
-  const lowHp = 6 + Math.floor(index * 0.75) + Math.floor(Math.random() * 3);
-  const highHp = lowHp + 5 + Math.floor(Math.random() * 4);
+  const lowHp = 5 + theme.layer + Math.floor(arcProgress * 7) + Math.floor(Math.random() * 2);
+  const highHp = lowHp + 3 + Math.floor(Math.random() * 3);
   const lowBlock = createItemBlock(lowLane, lowHp, createReward(index, false, theme), { big: true });
   const highBlock = createItemBlock(highLane, highHp, createReward(index + 1, true, theme), {
     big: true,
     superCrystal: true,
   });
-  lowBlock.perk = createPerk(index, false, theme);
-  highBlock.perk = createPerk(index, true, theme);
+  lowBlock.perk = options.perkLow ?? createPerk(index, false, theme);
+  highBlock.perk = options.perkHigh ?? createPerk(index, true, theme);
   return {
     index,
-    hint: `${theme.name}：左右都很香，快選一邊`,
+    hint: describeStage(index, `${theme.name}的雙側補給同步出現`),
+    storyTitle: script.title,
     blocks: [lowBlock, highBlock],
   };
 }
 
-function createEnemyRow(index, lane) {
-  const theme = getStageTheme(index);
-  const enemy = createEnemyBlock(index, lane, { preferFast: true, theme });
+function createEnemyRow(index, lane, options = {}) {
+  const theme = getStoryArc(index);
+  const script = getLevelScript(index);
+  const enemy = createEnemyBlock(index, lane, {
+    preferFast: true,
+    theme,
+    forcedType: options.forcedEnemy ?? null,
+    elite: options.elite ?? false,
+  });
   return {
     index,
-    hint: `${theme.name}：${enemy.enemyStats.name}來了，沒打掉就直接輸`,
+    hint: describeStage(index, `${enemy.enemyStats.name}來了，沒打掉就直接輸`),
+    storyTitle: script.title,
     blocks: [enemy],
   };
 }
 
-function createDoubleEnemyRow(index) {
-  const theme = getStageTheme(index);
-  const leftEnemy = createEnemyBlock(index + 1, 0, { preferFast: true, theme });
-  const rightEnemy = createEnemyBlock(index + 2, 1, { preferFast: true, theme });
+function createDoubleEnemyRow(index, options = {}) {
+  const theme = getStoryArc(index);
+  const script = getLevelScript(index);
+  const forcedLeft = Array.isArray(options.forcedEnemy) ? options.forcedEnemy[0] : null;
+  const forcedRight = Array.isArray(options.forcedEnemy) ? options.forcedEnemy[1] : null;
+  const leftEnemy = createEnemyBlock(index + 1, 0, { preferFast: true, theme, forcedType: forcedLeft });
+  const rightEnemy = createEnemyBlock(index + 2, 1, { preferFast: true, theme, forcedType: forcedRight });
   return {
     index,
-    hint: `${theme.name}：${leftEnemy.enemyStats.name}和${rightEnemy.enemyStats.name}一起衝下來了`,
+    hint: describeStage(index, `${leftEnemy.enemyStats.name}和${rightEnemy.enemyStats.name}一起衝下來了`),
+    storyTitle: script.title,
     blocks: [leftEnemy, rightEnemy],
   };
 }
 
-function createEliteEnemyRow(index) {
-  const theme = getStageTheme(index);
+function createEliteEnemyRow(index, options = {}) {
+  const theme = getStoryArc(index);
+  const script = getLevelScript(index);
   const lane = Math.random() < 0.5 ? 0 : 1;
-  const forcedType = randomChoice(["tank", "runner", "flyer"]);
+  const forcedType = options.forcedEnemy ?? randomChoice(["tank", "runner", "flyer"]);
   const enemy = createEnemyBlock(index + 2, lane, { preferFast: true, forcedType, elite: true, theme });
   return {
     index,
-    hint: `${theme.name}：精英${enemy.enemyStats.name}來了，先把它打掉`,
+    hint: describeStage(index, `精英${enemy.enemyStats.name}來了，先把它打掉`),
+    storyTitle: script.title,
     blocks: [enemy],
   };
 }
 
-function createMixedRow(index) {
-  const theme = getStageTheme(index);
-  const enemyLane = Math.random() < 0.5 ? 0 : 1;
+function createMixedRow(index, options = {}) {
+  const theme = getStoryArc(index);
+  const script = getLevelScript(index);
+  const arcProgress = getArcProgress(index);
+  const enemyLane = options.enemyLane ?? (Math.random() < 0.5 ? 0 : 1);
   const itemLane = enemyLane === 0 ? 1 : 0;
-  const itemHp = 7 + Math.floor(index * 0.45) + Math.floor(Math.random() * 3);
-  const enemy = createEnemyBlock(index + 1, enemyLane, { preferFast: true, theme });
+  const itemHp = 6 + theme.layer + Math.floor(arcProgress * 5) + Math.floor(Math.random() * 2);
+  const enemy = createEnemyBlock(index + 1, enemyLane, { preferFast: true, theme, forcedType: options.forcedEnemy ?? null });
   const item = createItemBlock(itemLane, itemHp, createReward(index + 1, true, theme), {
     big: true,
     superCrystal: index > 8,
   });
-  item.perk = createPerk(index + 1, true, theme);
+  item.perk = options.perk ?? createPerk(index + 1, true, theme);
   return {
     index,
-    hint: `${theme.name}：${enemy.enemyStats.name}優先，安全後再回收${ITEM_NAME}`,
+    hint: describeStage(index, `${enemy.enemyStats.name}優先，安全後再回收${ITEM_NAME}`),
+    storyTitle: script.title,
     blocks: [enemy, item],
   };
 }
 
-function createJackpotRow(index) {
-  const theme = getStageTheme(index);
-  const leftBlock = createItemBlock(0, 7 + Math.floor(index * 0.55), createReward(index + 2, true, theme), {
+function createJackpotRow(index, options = {}) {
+  const theme = getStoryArc(index);
+  const script = getLevelScript(index);
+  const arcProgress = getArcProgress(index);
+  const leftBlock = createItemBlock(0, 6 + theme.layer + Math.floor(arcProgress * 6), createReward(index + 2, true, theme), {
     big: true,
     superCrystal: true,
   });
-  const rightBlock = createItemBlock(1, 9 + Math.floor(index * 0.65), createReward(index + 3, true, theme), {
+  const rightBlock = createItemBlock(1, 8 + theme.layer + Math.floor(arcProgress * 7), createReward(index + 3, true, theme), {
     big: true,
     superCrystal: true,
   });
-  leftBlock.perk = createPerk(index + 1, true, theme);
-  rightBlock.perk = createPerk(index + 2, true, theme);
+  leftBlock.perk = options.perkLow ?? createPerk(index + 1, true, theme);
+  rightBlock.perk = options.perkHigh ?? createPerk(index + 2, true, theme);
   return {
     index,
-    hint: `${theme.name}：寶藏雨來了，這排超肥`,
+    hint: describeStage(index, "寶藏雨來了，這排超肥"),
+    storyTitle: script.title,
     blocks: [leftBlock, rightBlock],
   };
 }
 
-function createGauntletRow(index) {
-  const theme = getStageTheme(index);
+function createGauntletRow(index, options = {}) {
+  const theme = getStoryArc(index);
+  const script = getLevelScript(index);
+  const arcProgress = getArcProgress(index);
   const enemy = createEnemyBlock(index + 2, 0, {
     preferFast: true,
-    elite: index > 9,
-    forcedType: randomChoice(["runner", "tank", "flyer"]),
+    elite: options.elite ?? index > 9,
+    forcedType: options.forcedEnemy ?? randomChoice(["runner", "tank", "flyer"]),
     theme,
   });
-  const item = createItemBlock(1, 10 + Math.floor(index * 0.7), createReward(index + 2, true, theme), {
+  const item = createItemBlock(1, 8 + theme.layer + Math.floor(arcProgress * 8), createReward(index + 2, true, theme), {
     big: true,
     superCrystal: true,
   });
-  item.perk = randomChoice(["laser", "power", "fire", "ice", "poison"]);
+  item.perk = options.perk ?? randomChoice(["laser", "power", "fire", "ice", "poison"]);
   return {
     index,
-    hint: `${theme.name}：先扛住猛怪，再拿超值寶藏`,
+    hint: describeStage(index, "先扛住猛怪，再拿超值寶藏"),
+    storyTitle: script.title,
     blocks: [enemy, item],
   };
 }
 
 function createRow(index) {
-  if (index === 0) return createSingleRow(index, 0);
-  if (index === 1) return createSingleRow(index, 1);
-  if (index === 2) return createMixedRow(index);
-  if (index === 3) return createDoubleEnemyRow(index);
-  if (index === 4 || index === 9 || index === 14) return createJackpotRow(index);
-  if (index === 7 || index === 13 || index === 18) return createEliteEnemyRow(index);
-  if (index === 11 || index === 16) return createGauntletRow(index);
-
-  const roll = Math.random();
-  if (roll < 0.16) return createSingleRow(index, 0);
-  if (roll < 0.32) return createSingleRow(index, 1);
-  if (roll < 0.46) return createMixedRow(index);
-  if (roll < 0.58) return createJackpotRow(index);
-  if (roll < 0.78) return createEnemyRow(index, Math.random() < 0.5 ? 0 : 1);
-  if (roll < 0.86) return createEliteEnemyRow(index);
-  if (roll < 0.92) return createDoubleEnemyRow(index);
-  if (roll < 0.97) return createGauntletRow(index);
-  return createDualRow(index);
+  const script = getLevelScript(index);
+  if (script.rowType === "single") return createSingleRow(index, script.lane ?? 0, script);
+  if (script.rowType === "dual") return createDualRow(index, script);
+  if (script.rowType === "enemy") return createEnemyRow(index, script.lane ?? 0, script);
+  if (script.rowType === "doubleEnemy") return createDoubleEnemyRow(index, script);
+  if (script.rowType === "elite") return createEliteEnemyRow(index, script);
+  if (script.rowType === "mixed") return createMixedRow(index, script);
+  if (script.rowType === "jackpot") return createJackpotRow(index, script);
+  if (script.rowType === "gauntlet") return createGauntletRow(index, script);
+  return createSingleRow(index, 0, script);
 }
 
-function createBoss() {
+function createBoss(arc = getCurrentStoryArc()) {
+  const profile = BOSS_PROFILES[Math.min(BOSS_PROFILES.length - 1, arc.layer - 1)];
   return {
-    hp: 90,
-    maxHp: 90,
-    rewardType: BOSS_REWARD.type,
-    rewardValue: BOSS_REWARD.value,
-    reward: BOSS_REWARD,
+    name: profile.name,
+    title: profile.title,
+    abilityText: profile.abilityText,
+    intro: profile.intro,
+    defeat: profile.defeat,
+    hp: profile.hp,
+    maxHp: profile.hp,
+    rewardType: profile.reward.type,
+    rewardValue: profile.reward.value,
+    reward: profile.reward,
     state: "falling",
     y: -88,
+    xOffset: 0,
     hitFlash: 0,
     burnFrames: 0,
     poisonFrames: 0,
     slowFrames: 0,
     statusTick: 0,
+    bodyColor: profile.bodyColor,
+    accentColor: profile.accentColor,
+    glowColor: profile.glowColor,
+    abilityType: profile.abilityType,
+    speedMultiplier: profile.speedMultiplier,
+    breachDamage: profile.breachDamage,
+    armor: profile.armor ?? 0,
+    burnResist: profile.burnResist ?? 0,
+    laserResist: profile.laserResist ?? 0,
+    dashInterval: profile.dashInterval ?? 0,
+    dashDuration: profile.dashDuration ?? 0,
+    dashCooldown: profile.dashInterval ?? 0,
+    dashFrames: 0,
+    swayAmplitude: profile.swayAmplitude ?? 0,
+    shieldCooldownMax: profile.shieldCooldownMax ?? 0,
+    shieldCooldown: profile.shieldCooldownMax ?? 0,
+    shieldHp: 0,
+    shieldMaxHp: profile.shieldStrength ?? 0,
   };
 }
 
@@ -792,7 +1129,7 @@ function hideOverlay() {
 
 function getCurrentHint() {
   if (state.treasureRushFrames > 0) return `寶藏狂熱中，現在打寶物更賺`;
-  if (state.bossActive) return `${BOSS_NAME}完整進場後才可受擊`;
+  if (state.bossActive && state.boss) return `${state.boss.name}：${state.boss.abilityText}`;
   if (state.currentRow) return state.currentRow.hint;
   return `${FACTION_NAME}出發`;
 }
@@ -806,6 +1143,7 @@ function getElementMode() {
 }
 
 function getWeaponTitle() {
+  const arc = getCurrentStoryArc();
   const elementMode = getElementMode();
   const baseMode = state.powerShotFrames > 0 ? "重砲" : state.rapidFireFrames > 0 ? "快射" : "";
   const elementTitle =
@@ -818,12 +1156,12 @@ function getWeaponTitle() {
         : elementMode === "poison"
             ? "毒泡"
             : "";
-  if (state.treasureRushFrames > 0) return `寶藏狂熱 ${Math.ceil(state.treasureRushFrames / 30)}`;
-  if (baseMode && elementTitle) return `${baseMode}+${elementTitle}`;
-  if (baseMode) return baseMode;
-  if (elementTitle) return elementTitle;
+  if (state.treasureRushFrames > 0) return `${arc.weaponName}・寶藏狂熱 ${Math.ceil(state.treasureRushFrames / 30)}`;
+  if (baseMode && elementTitle) return `${arc.weaponName}・${baseMode}+${elementTitle}`;
+  if (baseMode) return `${arc.weaponName}・${baseMode}`;
+  if (elementTitle) return `${arc.weaponName}・${elementTitle}`;
   if (state.shieldCharges > 0) return `護盾×${state.shieldCharges}`;
-  return "無";
+  return arc.weaponName;
 }
 
 function getDangerActive() {
@@ -836,7 +1174,18 @@ function getDangerActive() {
 }
 
 function gainUltimateCharge(amount) {
-  state.ultimateCharge = Math.min(ULTIMATE_MAX, state.ultimateCharge + amount);
+  const bonus = getCurrentStoryArc().weaponMode === "power" ? 1.18 : 1;
+  state.ultimateCharge = Math.min(ULTIMATE_MAX, state.ultimateCharge + amount * bonus * 1.12);
+}
+
+function consumeShieldCharge(label = "護盾擋下了") {
+  if (state.shieldCharges <= 0) return false;
+  state.shieldCharges -= 1;
+  state.message = label;
+  pushFloater("BLOCK", W / 2, PLAYER_COLLISION_Y - 26, "#c4b5fd");
+  triggerScreenShake(12, 10);
+  updateHud();
+  return true;
 }
 
 function canUseUltimate() {
@@ -846,7 +1195,7 @@ function canUseUltimate() {
 }
 
 function getUltimateProgress() {
-  return Math.max(0, Math.min(ULTIMATE_MAX, state.ultimateCharge));
+  return Math.round(Math.max(0, Math.min(ULTIMATE_MAX, state.ultimateCharge)));
 }
 
 function getUltimateChargeRemaining() {
@@ -869,12 +1218,13 @@ function activateTreasureRush(x = W / 2, y = PLAYER_COLLISION_Y - 80) {
 }
 
 function updateHud() {
+  const arc = getCurrentStoryArc();
   const ultimateProgress = getUltimateProgress();
   const ultimateRemaining = getUltimateChargeRemaining();
   const ultimateReady = canUseUltimate();
   scoreValue.textContent = `${state.troop}`;
-  const stage = state.bossActive ? TOTAL_ROWS : Math.min(state.rowsCompleted + 1, TOTAL_ROWS);
-  stageValue.textContent = `${stage} / ${TOTAL_ROWS}`;
+  stageValue.textContent = `${getCurrentStageInArc()} / ${STAGES_PER_ARC}`;
+  if (chapterValue) chapterValue.textContent = getChapterLabel();
   hintValue.textContent = getCurrentHint();
   comboValue.textContent = `${state.combo}`;
   boostValue.textContent = getWeaponTitle();
@@ -896,7 +1246,7 @@ function updateHud() {
 }
 
 function spawnBullet() {
-  const elementMode = getElementMode();
+  const elementMode = getElementMode() ?? getBaseWeaponMode();
   playSfx("shoot");
   state.bullets.push({
     lane: state.currentLane,
@@ -954,9 +1304,9 @@ function applyPerk(block) {
     state.message += "  黏黏毒泡砲";
     pushFloater("毒泡", LANES[block.lane], state.currentRowY - 44, "#86efac");
   } else if (block.perk === "shield") {
-    state.shieldCharges += 1;
+    state.shieldCharges = Math.min(3, state.shieldCharges + 1);
     state.message += "  護盾 +1";
-    pushFloater("護盾", LANES[block.lane], state.currentRowY - 44, "#a78bfa");
+    pushFloater(`護盾 ${state.shieldCharges}/3`, LANES[block.lane], state.currentRowY - 44, "#a78bfa");
   }
   updateHud();
 }
@@ -1135,6 +1485,8 @@ function applyCrystalPower(block) {
 }
 
 function startGame() {
+  const openingArc = STORY_ARCS[0];
+  const openingStage = LEVEL_SCRIPTS[0];
   resumeAudio();
   playTone(440, 0.14, { type: "triangle", volume: 0.12 });
   playTone(660, 0.18, { type: "triangle", volume: 0.1, when: 0.08 });
@@ -1151,7 +1503,7 @@ function startGame() {
   state.currentRowY = ROW_START_Y;
   state.currentRowResolved = false;
   state.bossActive = false;
-  state.boss = createBoss();
+  state.boss = createBoss(STORY_ARCS[0]);
   state.ultimateCharge = 0;
   state.ultimateFlashFrames = 0;
   state.slowMoFrames = 0;
@@ -1160,7 +1512,7 @@ function startGame() {
   state.frameCount = 0;
   state.treasureRushFrames = 0;
   state.pickupChain = 0;
-  state.message = `${FACTION_NAME}出發`;
+  state.message = `${openingArc.name}啟程：${openingStage.title}`;
   resetCombatState();
   state.backgroundDrift = 0;
   audio.nextBgmTime = audio.ctx ? audio.ctx.currentTime : 0;
@@ -1205,9 +1557,13 @@ function activateUltimate() {
   pushUltimateBurst();
 
   if (state.bossActive && state.boss?.state === "falling") {
-    state.boss.hp = Math.max(0, state.boss.hp - 28);
+    if (state.boss.shieldHp > 0) {
+      state.boss.shieldHp = Math.max(0, state.boss.shieldHp - 28);
+    } else {
+      state.boss.hp = Math.max(0, state.boss.hp - 28);
+    }
     state.boss.hitFlash = 10;
-    pushExplosion(W / 2, state.boss.y, "power");
+    pushExplosion(W / 2 + state.boss.xOffset, state.boss.y, "power");
     if (state.boss.hp <= 0) {
       updateBossStatusEffects();
     }
@@ -1240,12 +1596,13 @@ function completeCurrentRow() {
   state.transitionClears += 1;
   state.flashFrames = 14;
   state.rowsCompleted += 1;
-
-  if (state.rowsCompleted >= TOTAL_ROWS) {
+  if (state.rowsCompleted % STAGES_PER_ARC === 0) {
+    const clearedArc = getStoryArc(state.rowsCompleted - 1);
     state.currentRow = null;
     state.nextRow = null;
     state.bossActive = true;
-    state.boss = createBoss();
+    state.boss = createBoss(clearedArc);
+    state.message = state.boss.intro;
     updateHud();
     return;
   }
@@ -1288,7 +1645,8 @@ function missCurrentRow() {
   if (!state.currentRow) return;
   state.combo = 0;
   state.pickupChain = 0;
-  state.message = `${ITEM_NAME}漏接`;
+  state.troop = clampTroop(state.troop - Math.min(MISS_PENALTY, 4 + getCurrentStoryArc().layer));
+  state.message = `${ITEM_NAME}漏接 -${Math.min(MISS_PENALTY, 4 + getCurrentStoryArc().layer)}`;
   pushFloater("MISS ITEM", W / 2, PLAYER_COLLISION_Y - 20, "#94a3b8");
   for (const block of state.currentRow.blocks) {
     if (block.state === "falling" && block.entityType === "item") block.state = "missed";
@@ -1306,6 +1664,8 @@ function getBulletDamage(kind) {
   if (state.powerShotFrames > 0) damage += 2;
   if (kind === "laser") damage += 1;
   if (kind === "fire") damage += 1;
+  if (kind === "power") damage += 2;
+  if (kind === "rapid") damage += 1;
   return damage;
 }
 
@@ -1354,7 +1714,7 @@ function finishEnemyBreak(target, x, y) {
   gainUltimateCharge(target.isElite ? 40 : 28);
   state.message = `${target.lane === 0 ? "左" : "右"}${ENEMY_NAME}擊破`;
   pushFloater("CLEAR", x, y - 18, "#fca5a5");
-  const elementMode = getElementMode();
+  const elementMode = getElementMode() ?? getBaseWeaponMode();
   const explosionStyle =
     elementMode ??
     (state.powerShotFrames > 0 ? "power" : state.rapidFireFrames > 0 ? "rapid" : "normal");
@@ -1446,17 +1806,72 @@ function updateBossStatusEffects() {
     state.boss.state = "broken";
     resetCombatState({ delayNextShot: true });
     state.troop = clampTroop(applyReward(state.troop, state.boss.reward));
-    state.message = `${BOSS_NAME}打倒了 ${formatReward(state.boss.reward)}`;
+    state.message = `${state.boss.name}打倒了 ${formatReward(state.boss.reward)}`;
     pushFloater(formatReward(state.boss.reward), W / 2, state.boss.y - 36, "#ffd166");
     updateHud();
-    finishGame(true, "勝利", `你拿到 ${state.troop} 分，還打倒了${BOSS_NAME}。`);
+    if (state.rowsCompleted >= TOTAL_ROWS) {
+      finishGame(true, "最終勝利", `你拿到 ${state.troop} 分，還打倒了${state.boss.name}。 ${state.boss.defeat}`);
+      return;
+    }
+
+    const nextArc = getStoryArc(state.rowsCompleted);
+    state.bossActive = false;
+    state.boss = createBoss(nextArc);
+    state.currentRow = createRow(state.rowsCompleted);
+    state.nextRow = createRow(state.rowsCompleted + 1);
+    state.currentRowY = ROW_START_Y;
+    state.currentRowResolved = false;
+    state.flashFrames = 18;
+    state.message = `${nextArc.name}開門，主武器升級為${nextArc.weaponName}`;
+    pushFloater(nextArc.weaponName, W / 2, PLAYER_COLLISION_Y - 56, "#fde68a");
+    updateHud();
+  }
+}
+
+function triggerBossShield() {
+  if (!state.boss || state.boss.shieldMaxHp <= 0) return;
+  state.boss.shieldHp = state.boss.shieldMaxHp;
+  state.boss.shieldCooldown = state.boss.shieldCooldownMax;
+  state.message = `${state.boss.name}展開護盾`;
+  pushFloater("SHIELD", W / 2, state.boss.y - 60, "#93c5fd");
+}
+
+function updateBossBehavior() {
+  if (!state.boss || state.boss.state !== "falling") return;
+
+  if (state.boss.abilityType === "charge" || state.boss.abilityType === "hybrid") {
+    if (state.boss.dashFrames > 0) {
+      state.boss.dashFrames -= 1;
+    } else if (state.boss.dashInterval > 0) {
+      state.boss.dashCooldown -= 1;
+      if (state.boss.dashCooldown <= 0) {
+        state.boss.dashFrames = state.boss.dashDuration;
+        state.boss.dashCooldown = state.boss.dashInterval;
+        state.message = `${state.boss.name}衝鋒`;
+        pushFloater("CHARGE", W / 2, state.boss.y - 52, "#fda4af");
+      }
+    }
+  }
+
+  if (state.boss.abilityType === "shield" || state.boss.abilityType === "hybrid") {
+    if (state.boss.shieldHp <= 0 && state.boss.shieldCooldownMax > 0) {
+      state.boss.shieldCooldown -= 1;
+      if (state.boss.shieldCooldown <= 0) triggerBossShield();
+    }
+  }
+
+  if (state.boss.abilityType === "sway") {
+    state.boss.xOffset = Math.sin(state.frameCount * 0.045) * state.boss.swayAmplitude;
+  } else {
+    state.boss.xOffset = 0;
   }
 }
 
 function updateBullets() {
-  const bulletMode = getElementMode();
-  let currentFireInterval = state.rapidFireFrames > 0 ? Math.max(3, FIRE_INTERVAL - 4) : FIRE_INTERVAL;
-  if (bulletMode === "laser") currentFireInterval = Math.max(4, currentFireInterval - 1);
+  const bulletMode = getElementMode() ?? getBaseWeaponMode();
+  let currentFireInterval =
+    state.rapidFireFrames > 0 || bulletMode === "rapid" ? Math.max(3, FIRE_INTERVAL - 4) : FIRE_INTERVAL;
+  if (bulletMode === "laser") currentFireInterval = Math.max(3, currentFireInterval - 1);
   state.fireCooldown -= 1;
   if (state.fireCooldown <= 0) {
     spawnBullet();
@@ -1510,16 +1925,29 @@ function hitBoss() {
 
   for (let i = state.bullets.length - 1; i >= 0; i -= 1) {
     const bullet = state.bullets[i];
-    const dx = Math.abs(bullet.x - W / 2);
+    const bossX = W / 2 + state.boss.xOffset;
+    const dx = Math.abs(bullet.x - bossX);
     const dy = Math.abs(bullet.y - state.boss.y);
     if (dx < 96 && dy < 74) {
-      const damage = getBulletDamage(bullet.kind);
-      state.boss.hp = Math.max(0, state.boss.hp - damage);
+      let damage = Math.max(1, getBulletDamage(bullet.kind) - state.boss.armor);
+      if (bullet.kind === "laser" && state.boss.laserResist) {
+        damage = Math.max(1, Math.round(damage * (1 - state.boss.laserResist)));
+      }
+      if (bullet.kind === "fire" && state.boss.burnResist) {
+        damage = Math.max(1, Math.round(damage * (1 - state.boss.burnResist * 0.4)));
+      }
       state.boss.hitFlash = 5;
       playSfx("hit");
-      applyElementHit(state.boss, bullet.kind);
-      state.message = `${BOSS_NAME} -${damage}`;
-      pushFloater(`-${damage}`, W / 2, state.boss.y - 18, "#fef3c7");
+      if (state.boss.shieldHp > 0) {
+        state.boss.shieldHp = Math.max(0, state.boss.shieldHp - damage);
+        state.message = `${state.boss.name}護盾 -${damage}`;
+        pushFloater(`盾-${damage}`, bossX, state.boss.y - 18, "#bfdbfe");
+      } else {
+        state.boss.hp = Math.max(0, state.boss.hp - damage);
+        applyElementHit(state.boss, bullet.kind);
+        state.message = `${state.boss.name} -${damage}`;
+        pushFloater(`-${damage}`, bossX, state.boss.y - 18, "#fef3c7");
+      }
       state.bullets.splice(i, 1);
       if (state.boss.hp <= 0) {
         updateBossStatusEffects();
@@ -1545,8 +1973,8 @@ function updateCurrentRow() {
   const enemySpeedMultiplier = state.currentRow.blocks
     .filter((block) => block.entityType === "enemy" && block.state === "falling")
     .reduce((maxSpeed, block) => {
-      const dashBoost = block.dashFrames > 0 ? 1.7 : 1;
-      return Math.max(maxSpeed, (block.enemyStats?.speed ?? 1) * dashBoost);
+      const dashBoost = block.dashFrames > 0 ? 1.45 : 1;
+      return Math.max(maxSpeed, 0.9 + (block.enemyStats?.speed ?? 1) * 0.72 * dashBoost);
     }, 1);
   state.currentRowY += ROW_SPEED * enemySpeedMultiplier * (slowed ? 0.58 : 1);
 
@@ -1556,6 +1984,16 @@ function updateCurrentRow() {
     (block) => block.entityType === "enemy" && block.state === "falling" && state.currentRowY >= PLAYER_COLLISION_Y,
   );
   if (enemyBrokeThrough) {
+    if (consumeShieldCharge("護盾擋住了裂界獸")) {
+      for (const block of state.currentRow.blocks) {
+        if (block.entityType === "enemy" && block.state === "falling") {
+          block.state = "broken";
+          block.breakFrames = 10;
+        }
+      }
+      state.currentRowResolved = true;
+      return;
+    }
     state.combo = 0;
     state.message = `${ENEMY_NAME}突破`;
     pushFloater("BREACH", W / 2, PLAYER_COLLISION_Y - 20, "#ef476f");
@@ -1591,18 +2029,26 @@ function updateCurrentRow() {
 function updateBoss() {
   if (!state.bossActive || !state.boss || state.boss.state !== "falling") return;
 
-  state.boss.y += ROW_SPEED * (state.boss.slowFrames > 0 ? 0.6 : 1);
+  updateBossBehavior();
+  const dashBoost = state.boss.dashFrames > 0 ? 1.75 : 1;
+  state.boss.y += ROW_SPEED * state.boss.speedMultiplier * dashBoost * (state.boss.slowFrames > 0 ? 0.6 : 1);
   if (state.boss.hitFlash > 0) state.boss.hitFlash -= 1;
   updateBossStatusEffects();
   if (!state.running || !state.boss || state.boss.state !== "falling") return;
   hitBoss();
 
   if (state.running && isFullyVisible(state.boss.y, 74) && state.boss.y >= PLAYER_COLLISION_Y) {
+    if (consumeShieldCharge(`${state.boss.name}的衝撞被護盾擋下`)) {
+      state.boss.y = PLAYER_COLLISION_Y - 86;
+      state.boss.dashFrames = 0;
+      state.boss.hitFlash = 10;
+      return;
+    }
     state.combo = 0;
-    state.troop = clampTroop(state.troop - 20);
-    state.message = `${BOSS_NAME}衝撞 -20`;
+    state.troop = clampTroop(state.troop - state.boss.breachDamage);
+    state.message = `${state.boss.name}衝撞 -${state.boss.breachDamage}`;
     updateHud();
-    finishGame(false, "失敗", `${BOSS_NAME}沒有先被打倒，它撞到終點了。`);
+    finishGame(false, "失敗", `${state.boss.name}沒有先被打倒，它撞到終點了。`);
   }
 }
 
@@ -1666,14 +2112,15 @@ function update() {
 
 function drawBackground() {
   ctx.clearRect(0, 0, W, H);
-
+  const arc = getCurrentStoryArc();
+  const { palette } = arc;
   const gradient = ctx.createLinearGradient(0, 0, 0, H);
-  gradient.addColorStop(0, "#8ecae6");
-  gradient.addColorStop(1, "#d7f5cf");
+  gradient.addColorStop(0, palette.skyTop);
+  gradient.addColorStop(1, palette.skyBottom);
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, W, H);
 
-  ctx.fillStyle = "rgba(255,255,255,0.22)";
+  ctx.fillStyle = palette.haze;
   for (let i = 0; i < 8; i += 1) {
     const y = (i * 120 + state.backgroundDrift) % (H + 120) - 120;
     ctx.beginPath();
@@ -1681,14 +2128,74 @@ function drawBackground() {
     ctx.fill();
   }
 
-  ctx.strokeStyle = "rgba(20,33,61,0.15)";
+  if (arc.id === "meadow") {
+    ctx.fillStyle = "rgba(255,255,255,0.15)";
+    for (let i = 0; i < 5; i += 1) {
+      ctx.beginPath();
+      ctx.arc(40 + i * 90, 100 + Math.sin((state.backgroundDrift + i * 24) * 0.03) * 12, 18, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (arc.id === "harbor") {
+    ctx.strokeStyle = "rgba(255,255,255,0.22)";
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 6; i += 1) {
+      const y = 160 + i * 88 + (state.backgroundDrift % 28);
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.quadraticCurveTo(W * 0.5, y + 18, W, y);
+      ctx.stroke();
+    }
+  } else if (arc.id === "rift") {
+    ctx.fillStyle = palette.accentSoft;
+    for (let i = 0; i < 7; i += 1) {
+      const y = 110 + i * 96 + (state.backgroundDrift % 18);
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(100, y + 12);
+      ctx.lineTo(180, y - 8);
+      ctx.lineTo(260, y + 18);
+      ctx.lineTo(W, y - 10);
+      ctx.lineTo(W, y + 24);
+      ctx.lineTo(0, y + 28);
+      ctx.closePath();
+      ctx.fill();
+    }
+  } else if (arc.id === "observatory") {
+    for (let i = 0; i < 40; i += 1) {
+      const x = (i * 47) % W;
+      const y = (i * 61 + state.backgroundDrift * 1.8) % H;
+      ctx.fillStyle = i % 3 === 0 ? "rgba(255,255,255,0.85)" : "rgba(34,211,238,0.55)";
+      ctx.fillRect(x, y, 2, 2);
+    }
+    ctx.strokeStyle = "rgba(34,211,238,0.14)";
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 4; i += 1) {
+      ctx.beginPath();
+      ctx.arc(W * 0.5, H * 0.35, 70 + i * 40, 0.15 * Math.PI, 0.85 * Math.PI);
+      ctx.stroke();
+    }
+  } else if (arc.id === "skyforge") {
+    for (let i = 0; i < 12; i += 1) {
+      const x = 20 + i * 34;
+      const y = 90 + ((i * 57 + state.backgroundDrift * 2.2) % (H + 120)) - 60;
+      ctx.strokeStyle = "rgba(244,114,182,0.25)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 16, y + 22);
+      ctx.lineTo(x - 10, y + 40);
+      ctx.stroke();
+    }
+  }
+
+  ctx.strokeStyle = palette.road;
   ctx.lineWidth = 10;
   ctx.beginPath();
   ctx.moveTo(W * 0.5, 0);
   ctx.lineTo(W * 0.5, H);
   ctx.stroke();
 
-  ctx.strokeStyle = "rgba(255,255,255,0.55)";
+  ctx.strokeStyle = palette.lane;
   ctx.lineWidth = 6;
   ctx.setLineDash([22, 22]);
   ctx.beginPath();
@@ -1696,6 +2203,10 @@ function drawBackground() {
   ctx.lineTo(W * 0.5, H);
   ctx.stroke();
   ctx.setLineDash([]);
+
+  ctx.fillStyle = palette.accentSoft;
+  ctx.fillRect(0, 0, W, 16);
+  ctx.fillRect(0, H - 18, W, 18);
 
 }
 
@@ -2274,13 +2785,34 @@ function drawBoss() {
   if (!state.bossActive || !state.boss || state.boss.state !== "falling") return;
 
   ctx.save();
-  ctx.translate(W / 2, state.boss.y);
-  ctx.fillStyle = state.boss.hitFlash > 0 ? "#fef3c7" : "#14213d";
+  ctx.translate(W / 2 + state.boss.xOffset, state.boss.y);
+  ctx.fillStyle = state.boss.glowColor;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 118, 92, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = state.boss.hitFlash > 0 ? "#fef3c7" : state.boss.bodyColor;
   roundedRectPath(ctx, -96, -74, 192, 148, 30);
+  ctx.fill();
+  ctx.fillStyle = state.boss.accentColor;
+  roundedRectPath(ctx, -72, -60, 144, 24, 12);
   ctx.fill();
   drawStatusEffects(192, 148, state.boss);
 
-  ctx.fillStyle = "#f6bd60";
+  if (state.boss.shieldHp > 0) {
+    ctx.strokeStyle = "rgba(191,219,254,0.85)";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(0, 0, 92, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = "#0f172a";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = "900 14px Avenir Next";
+  ctx.fillText(state.boss.name, 0, -48);
+
+  ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = "900 38px Avenir Next";
@@ -2291,12 +2823,19 @@ function drawBoss() {
   ctx.fillRect(-76, -50, 152, 14);
   ctx.fillStyle = "#80ed99";
   ctx.fillRect(-76, -50, 152 * (state.boss.hp / state.boss.maxHp), 14);
+
+  if (state.boss.shieldMaxHp > 0) {
+    ctx.fillStyle = "rgba(191,219,254,0.18)";
+    ctx.fillRect(-76, -68, 152, 10);
+    ctx.fillStyle = "#93c5fd";
+    ctx.fillRect(-76, -68, 152 * (state.boss.shieldHp / state.boss.shieldMaxHp), 10);
+  }
   ctx.restore();
 }
 
 function drawPlayer() {
   const laneX = LANES[state.currentLane];
-  const elementMode = getElementMode();
+  const elementMode = getElementMode() ?? (getBaseWeaponMode() === "fire" || getBaseWeaponMode() === "laser" ? getBaseWeaponMode() : null);
   ctx.save();
   ctx.translate(laneX, PLAYER_Y);
 
@@ -2388,7 +2927,7 @@ function drawPlayer() {
   ctx.fillText(state.troop, 0, 68);
   ctx.fillStyle = "rgba(255,255,255,0.76)";
   ctx.font = "700 12px Avenir Next";
-  ctx.fillText(WEAPON_FAMILY, 0, 84);
+  ctx.fillText(getCurrentStoryArc().weaponName, 0, 84);
   ctx.restore();
 }
 
@@ -2399,8 +2938,20 @@ function drawBullets() {
 }
 
 function drawWeaponRig() {
-  const weaponMode = state.powerShotFrames > 0 ? "power" : state.rapidFireFrames > 0 ? "rapid" : "normal";
-  const elementMode = getElementMode();
+  const baseWeaponMode = getBaseWeaponMode();
+  const weaponMode =
+    state.powerShotFrames > 0
+      ? "power"
+      : state.rapidFireFrames > 0
+        ? "rapid"
+        : baseWeaponMode === "rapid" || baseWeaponMode === "power"
+          ? baseWeaponMode
+          : "normal";
+  const elementMode =
+    getElementMode() ??
+    (baseWeaponMode === "fire" || baseWeaponMode === "laser" || baseWeaponMode === "ice" || baseWeaponMode === "poison"
+      ? baseWeaponMode
+      : null);
   const muzzlePulse = state.fireCooldown <= 2 && state.running ? 1 : 0;
   const recoil = muzzlePulse ? 4 : 0;
 
@@ -2951,7 +3502,7 @@ window.__gameDebug = {
 loadBestProgress();
 state.currentRow = createRow(0);
 state.nextRow = createRow(1);
-state.boss = createBoss();
+state.boss = createBoss(STORY_ARCS[0]);
 updateHud();
 render();
 loop();

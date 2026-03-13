@@ -11,10 +11,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
     <title>Number Gate Rush: 打怪救寶物</title>
-    <link rel="manifest" href="./manifest.webmanifest?v=20260312-132800" />
-    <link rel="icon" href="./icons/icon-192.svg?v=20260312-132800" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="./icons/icon-192.svg?v=20260312-132800" />
-    <link rel="stylesheet" href="./styles.css?v=20260312-132800" />
+    <link rel="manifest" href="./manifest.webmanifest?v=20260313-100622" />
+    <link rel="icon" href="./icons/icon-192.svg?v=20260313-100622" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.svg?v=20260313-100622" />
+    <link rel="stylesheet" href="./styles.css?v=20260313-100622" />
   </head>
   <body>
     <div class="app-chrome" aria-live="polite">
@@ -36,12 +36,34 @@
         <p class="eyebrow">Arcade Prototype</p>
         <h1>Number Gate Rush: 打怪救寶物</h1>
         <p class="intro-copy">
-          你是一台勇敢的小砲台，拿著會變身的玩具元素砲，要一邊打小怪獸，一邊收集會加分的寶物方塊。寶物掉走沒關係，但小怪獸跑到底就輸了。
+          在星弧王國裡，五枚「數字核心」被裂界獸偷走，整個世界開始一層層坍塌。你要駕駛守門砲台穿越 5 個異世界，每一層各打完 20 關，並擊倒一隻有專屬能力的大魔王，總共突破 100 個劇情關卡，把核心帶回中央塔。
         </p>
         <div class="legend">
-          <span class="badge plus">藍綠方塊：寶物</span>
-          <span class="badge minus">紅色目標：小怪獸</span>
-          <span class="badge neutral">火焰、雷射、冰、毒都是元素砲的變身道具</span>
+          <span class="badge plus">晶核方塊：回收能量與劇情道具</span>
+          <span class="badge minus">裂界獸：任何一隻衝線都會讓防線崩潰</span>
+          <span class="badge neutral">每一層都會解鎖新武器，最後還要面對該層專屬 Boss</span>
+        </div>
+        <div class="story-arc-list" aria-label="Story arcs">
+          <article class="story-arc-card">
+            <strong>第 1 層 晨霧田野</strong>
+            <span>武器：曙光彈弓</span>
+          </article>
+          <article class="story-arc-card">
+            <strong>第 2 層 潮音港灣</strong>
+            <span>武器：潮汐連弩</span>
+          </article>
+          <article class="story-arc-card">
+            <strong>第 3 層 熔核裂谷</strong>
+            <span>武器：熔核破城砲</span>
+          </article>
+          <article class="story-arc-card">
+            <strong>第 4 層 極光觀測站</strong>
+            <span>武器：極光折射槍</span>
+          </article>
+          <article class="story-arc-card">
+            <strong>第 5 層 龍脈天穹</strong>
+            <span>武器：龍脈時序炮</span>
+          </article>
         </div>
         <div class="controls">
           <span><kbd>A</kbd> / <kbd>←</kbd> 往左</span>
@@ -66,8 +88,12 @@
             <strong id="stage-value">1 / 20</strong>
           </div>
           <div class="hud-block">
+            <span class="hud-label">章節</span>
+            <strong id="chapter-value">第 1 層</strong>
+          </div>
+          <div class="hud-block">
             <span class="hud-label">最佳路線</span>
-            <strong id="hint-value">先打小怪獸</strong>
+            <strong id="hint-value">回收第一枚數字核心</strong>
           </div>
           <div class="hud-block">
             <span class="hud-label">連擊</span>
@@ -92,10 +118,10 @@
             <canvas id="game" width="420" height="720" aria-label="Number Gate Rush"></canvas>
             <div id="overlay" class="overlay">
               <div class="overlay-card">
-                <p id="overlay-kicker" class="overlay-kicker">小砲台準備好了</p>
-                <h2 id="overlay-title">打小怪獸，接住好寶物</h2>
+                <p id="overlay-kicker" class="overlay-kicker">中央塔任務啟動</p>
+                <h2 id="overlay-title">穿越五層世界，奪回數字核心</h2>
                 <p id="overlay-text">
-                  小砲台會自動發射。打爆寶物方塊才會讓玩具元素砲變身，像火焰、雷射、冰霜和毒泡；漏掉只是沒拿到，但任何小怪獸跑過終點，這局就結束。
+                  守門砲台會自動射擊。先擋住裂界獸，再回收晶核方塊；每一層都有 20 關，推完整層才會切換世界背景並升級主武器。任何敵人衝線，整個遠征就會失敗。
                 </p>
                 <button id="restart-button" class="primary-button">開始</button>
               </div>
@@ -120,6 +146,6 @@
       </section>
     </main>
 
-    <script src="./game.js?v=20260312-132800"></script>
+    <script src="./game.js?v=20260313-100622"></script>
   </body>
 </html>

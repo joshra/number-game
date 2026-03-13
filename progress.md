@@ -19,5 +19,15 @@ Original prompt: 確保在手機、平板和電腦上容易操作
 - 2026-03-12: Added an E2E assertion for the ultimate button cooldown/ready state and a small debug hook to set ultimate charge during tests.
 - 2026-03-12: `npm run test:e2e` passed after the ultimate cooldown UI update.
 - 2026-03-12: Extra Playwright screenshot inspection was blocked by sandboxed browser-launch permissions on macOS; rely on the passing E2E suite unless a non-sandboxed visual pass is needed later.
+- 2026-03-13: Rebuilt the game world into a five-layer campaign with 20 scripted stages, chapter-specific objectives, and distinct chapter weapon unlocks.
+- 2026-03-13: Updated the intro/overlay copy and added a visible story-arc panel so the new world setting is readable before play starts.
+- 2026-03-13: Wired chapter palettes into canvas background rendering and tied baseline firing behavior to the active chapter weapon.
+- 2026-03-13: `npm run test:e2e` passed after the story/world overhaul.
+- 2026-03-13: Direct `develop-web-game` Playwright-client visual pass is still blocked by the macOS sandbox browser-launch permission issue; rely on the passing E2E suite unless a non-sandboxed visual run is approved later.
+- 2026-03-13: Expanded campaign scale from 20 total stages to 5 layers x 20 stages each (100 stages total) and switched HUD stage progress to per-layer counting.
+- 2026-03-13: Replaced the single final boss with five layer-specific bosses; each layer now ends in its own boss fight with distinct passives such as charge, shield, armor, sway, and hybrid patterns.
+- 2026-03-13: Rebalanced combat curve by reducing late-stage HP inflation, lowering boss pressure, speeding up player baseline firepower, and making shield pickups absorb one breach/collision.
+- 2026-03-13: Added a 13-inch MacBook Air tuning pass for mid-width desktop screens with shorter viewport height: tighter shell spacing, slimmer sticky intro card, denser HUD/touch controls, and a taller effective game frame.
 - TODO: When future art/audio files are added, include them in `sw.js` precache or switch to a generated asset manifest to avoid stale offline bundles.
 - TODO: Replace the SVG-only icons with dedicated maskable PNG assets if this app is distributed more broadly; some Android launchers still render PNG maskables more consistently.
+- TODO: If chapter transitions need to feel more cinematic later, add mid-run chapter cut-ins or one-beat pause cards when entering stages 5/9/13/17.

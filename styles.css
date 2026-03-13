@@ -174,6 +174,33 @@ h1 {
   margin-bottom: 20px;
 }
 
+.story-arc-list {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 20px;
+}
+
+.story-arc-card {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(20, 33, 61, 0.06);
+  border: 1px solid rgba(20, 33, 61, 0.08);
+}
+
+.story-arc-card strong {
+  font-size: 0.95rem;
+}
+
+.story-arc-card span {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: rgba(20, 33, 61, 0.72);
+}
+
 .badge,
 .controls span {
   display: inline-flex;
@@ -538,6 +565,135 @@ canvas {
 
   .touch-button {
     min-height: 104px;
+  }
+}
+
+@media (min-width: 1100px) and (max-width: 1460px) and (max-height: 940px) {
+  :root {
+    --shell-width: min(1320px, calc(100% - 32px));
+    --frame-width: min(100%, clamp(410px, 35vw, 500px));
+    --frame-height: min(76vh, 700px);
+  }
+
+  .app-shell {
+    grid-template-columns: minmax(280px, 336px) minmax(0, 1fr);
+    gap: 20px;
+    padding: 16px 0 max(20px, env(safe-area-inset-bottom));
+  }
+
+  .intro-panel {
+    top: 16px;
+    padding: 24px;
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 3vw, 3rem);
+  }
+
+  .intro-copy {
+    margin: 14px 0 18px;
+    font-size: 0.94rem;
+    line-height: 1.5;
+  }
+
+  .legend,
+  .controls,
+  .story-arc-list {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .story-arc-card {
+    padding: 10px 12px;
+    border-radius: 16px;
+  }
+
+  .story-arc-card strong {
+    font-size: 0.9rem;
+  }
+
+  .story-arc-card span {
+    font-size: 0.78rem;
+  }
+
+  .badge,
+  .controls span {
+    padding: 8px 12px;
+    font-size: 0.84rem;
+  }
+
+  .device-note {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+  }
+
+  .game-panel {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .hud {
+    gap: 10px;
+  }
+
+  .hud-block {
+    min-height: 76px;
+    padding: 12px 14px;
+  }
+
+  .hud-label {
+    margin-bottom: 4px;
+  }
+
+  .hud-block strong {
+    font-size: 1rem;
+  }
+
+  .play-area {
+    grid-template-columns: minmax(400px, 1fr) minmax(180px, 220px);
+    gap: 16px;
+  }
+
+  .game-frame {
+    max-height: calc(100vh - 164px);
+  }
+
+  .overlay {
+    padding: 18px;
+  }
+
+  .overlay-card {
+    width: min(100%, 336px);
+    padding: 24px;
+  }
+
+  .overlay-card h2 {
+    font-size: 1.7rem;
+  }
+
+  .touch-controls {
+    gap: 10px;
+  }
+
+  .touch-button {
+    min-height: 84px;
+    padding: 14px 16px;
+  }
+
+  .touch-controls .touch-button:first-child,
+  .touch-controls .touch-button:last-child {
+    min-height: 96px;
+  }
+
+  .touch-title {
+    font-size: 1rem;
+  }
+
+  .touch-cooldown {
+    font-size: 1.12rem;
   }
 }
 
