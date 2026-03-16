@@ -897,18 +897,25 @@ body[data-handheld="true"][data-display-mode="standalone"] .app-chrome {
 
 body[data-handheld="true"] {
   min-height: var(--app-height);
+  width: 100%;
   padding-bottom: env(safe-area-inset-bottom);
+  overflow-x: hidden;
   overflow: hidden;
 }
 
 body[data-handheld="true"] .app-shell {
+  width: 100%;
   min-height: calc(var(--app-height) - var(--app-chrome-height));
+  height: calc(var(--app-height) - var(--app-chrome-height));
   padding: 8px 0 max(8px, env(safe-area-inset-bottom));
 }
 
 body[data-handheld="true"] .game-panel {
+  width: 100%;
   height: calc(var(--app-height) - var(--app-chrome-height) - 16px - env(safe-area-inset-bottom));
+  max-height: calc(var(--app-height) - var(--app-chrome-height) - 16px - env(safe-area-inset-bottom));
   min-height: 0;
+  padding: clamp(8px, 2.2vw, 10px);
   overflow: hidden;
 }
 
@@ -916,46 +923,134 @@ body[data-handheld="true"] .play-area {
   min-height: 0;
   height: 100%;
   align-content: stretch;
+  overflow: hidden;
 }
 
 body[data-handheld="true"] .play-stack {
   height: 100%;
-  gap: 10px;
+  min-height: 0;
+  gap: clamp(6px, 1.2vh, 10px);
 }
 
 body[data-handheld="true"] .game-frame {
-  width: min(100%, calc((var(--app-height) - var(--app-chrome-height) - 312px) * 7 / 12));
+  width: auto;
   min-height: 0;
   height: 100%;
   max-height: 100%;
+  max-width: 100%;
+  justify-self: center;
 }
 
 body[data-handheld="true"] .touch-controls {
+  grid-template-columns: 1fr 1.08fr 1fr;
   align-self: end;
   margin-top: 0;
-  padding: 10px;
+  width: min(100%, 460px);
+  gap: clamp(6px, 1.8vw, 10px);
+  padding: clamp(8px, 1.8vw, 10px);
+  border-radius: 24px;
+}
+
+body[data-handheld="true"] .touch-button,
+body[data-handheld="true"] .touch-controls .touch-button:first-child,
+body[data-handheld="true"] .touch-controls .touch-button:last-child {
+  min-height: clamp(74px, 11.2vh, 92px);
+  padding: clamp(10px, 2vw, 12px);
+  border-radius: 20px;
+}
+
+body[data-handheld="true"] .touch-button--ultimate {
+  grid-column: auto;
+}
+
+body[data-handheld="true"] .touch-button .ui-icon {
+  width: clamp(36px, 10vw, 46px);
+  height: clamp(36px, 10vw, 46px);
+}
+
+body[data-handheld="true"] .layer-guide {
+  gap: 6px;
+  padding: 8px 8px 9px;
+  border-radius: 18px;
+}
+
+body[data-handheld="true"] .layer-guide__header {
+  gap: 8px;
+}
+
+body[data-handheld="true"] .layer-guide__badge {
+  min-height: 30px;
+  padding: 4px 10px 4px 6px;
+}
+
+body[data-handheld="true"] .layer-guide__badge strong,
+body[data-handheld="true"] .layer-guide__stage {
+  font-size: 0.76rem;
+}
+
+body[data-handheld="true"] .layer-guide__dot {
+  height: 9px;
+}
+
+body[data-handheld="true"] .overlay {
+  padding: 12px;
+}
+
+body[data-handheld="true"] .overlay-card {
+  width: min(100%, 280px);
+  padding: 14px 14px 16px;
+  border-radius: 20px;
+}
+
+body[data-handheld="true"] .overlay-scene {
+  width: 76%;
+  margin-bottom: 10px;
+}
+
+body[data-handheld="true"] .overlay-card .primary-button {
+  min-height: 68px;
+  width: 92px;
+}
+
+body[data-handheld="true"] .overlay-card .primary-button .ui-icon {
+  width: 52px;
+  height: 52px;
 }
 
 @media (max-width: 720px) {
   body[data-handheld="true"] .game-panel {
-    padding: 10px;
-  }
-
-  body[data-handheld="true"] .game-frame {
-    width: min(100%, calc((var(--app-height) - var(--app-chrome-height) - 320px) * 7 / 12));
+    padding: clamp(8px, 2vw, 10px);
   }
 }
 
 @media (max-width: 560px) {
-  body[data-handheld="true"] .game-panel {
+  body[data-handheld="true"] .play-area {
+    gap: 6px;
+  }
+}
+
+@media (max-height: 860px) {
+  body[data-handheld="true"] .touch-controls {
     padding: 8px;
   }
 
-  body[data-handheld="true"] .play-area {
-    gap: 8px;
+  body[data-handheld="true"] .touch-button,
+  body[data-handheld="true"] .touch-controls .touch-button:first-child,
+  body[data-handheld="true"] .touch-controls .touch-button:last-child {
+    min-height: clamp(68px, 10vh, 80px);
   }
 
   body[data-handheld="true"] .game-frame {
-    width: min(100%, calc((var(--app-height) - var(--app-chrome-height) - 304px) * 7 / 12));
+    border-radius: 28px;
+  }
+
+  body[data-handheld="true"] .overlay-card {
+    width: min(100%, 252px);
+    padding: 12px 12px 14px;
+  }
+
+  body[data-handheld="true"] .overlay-card .primary-button {
+    min-height: 62px;
+    width: 82px;
   }
 }

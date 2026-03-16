@@ -18,6 +18,46 @@ async function setEasyCurrentRow(page) {
   );
 }
 
+async function expectHandheldLayoutFits(page, width, height) {
+  await page.setViewportSize({ width, height });
+  await startGame(page);
+
+  const metrics = await page.evaluate(() => {
+    const scrollingElement = document.scrollingElement;
+    const gamePanel = document.querySelector(".game-panel");
+    const gameFrame = document.querySelector(".game-frame");
+    const touchControls = document.querySelector(".touch-controls");
+    const guide = document.querySelector(".layer-guide");
+
+    return {
+      scrollHeight: scrollingElement?.scrollHeight ?? 0,
+      clientHeight: scrollingElement?.clientHeight ?? 0,
+      scrollWidth: scrollingElement?.scrollWidth ?? 0,
+      clientWidth: scrollingElement?.clientWidth ?? 0,
+      panelBottom: gamePanel?.getBoundingClientRect().bottom ?? 0,
+      frameBottom: gameFrame?.getBoundingClientRect().bottom ?? 0,
+      controlsBottom: touchControls?.getBoundingClientRect().bottom ?? 0,
+      controlsTop: touchControls?.getBoundingClientRect().top ?? 0,
+      controlsWidth: touchControls?.getBoundingClientRect().width ?? 0,
+      frameWidth: gameFrame?.getBoundingClientRect().width ?? 0,
+      guideHeight: guide?.getBoundingClientRect().height ?? 0,
+      viewportHeight: window.innerHeight,
+      viewportWidth: window.innerWidth,
+      handheld: document.body.dataset.handheld,
+    };
+  });
+
+  expect(metrics.handheld).toBe("true");
+  expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
+  expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
+  expect(metrics.panelBottom).toBeLessThanOrEqual(metrics.viewportHeight);
+  expect(metrics.frameBottom).toBeLessThanOrEqual(metrics.viewportHeight);
+  expect(metrics.controlsBottom).toBeLessThanOrEqual(metrics.viewportHeight);
+  expect(metrics.controlsTop).toBeGreaterThan(metrics.guideHeight);
+  expect(metrics.controlsWidth).toBeLessThanOrEqual(metrics.viewportWidth);
+  expect(metrics.frameWidth).toBeLessThanOrEqual(metrics.viewportWidth);
+}
+
 test("loads and starts a playable run", async ({ page }) => {
   await startGame(page);
 
@@ -193,29 +233,19 @@ test("ultimate stays locked below 100 percent charge", async ({ page }) => {
 });
 
 test("iphone 12 viewport fits the whole game without page scrolling", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await startGame(page);
+  await expectHandheldLayoutFits(page, 390, 844);
+});
 
-  const metrics = await page.evaluate(() => {
-    const scrollingElement = document.scrollingElement;
-    const gamePanel = document.querySelector(".game-panel");
-    const gameFrame = document.querySelector(".game-frame");
-    const touchControls = document.querySelector(".touch-controls");
+test("recent iPhone viewport classes all fit without overflow", async ({ page }) => {
+  const sizes = [
+    { width: 375, height: 812 },
+    { width: 390, height: 844 },
+    { width: 393, height: 852 },
+    { width: 428, height: 926 },
+    { width: 430, height: 932 },
+  ];
 
-    return {
-      scrollHeight: scrollingElement?.scrollHeight ?? 0,
-      clientHeight: scrollingElement?.clientHeight ?? 0,
-      panelBottom: gamePanel?.getBoundingClientRect().bottom ?? 0,
-      frameBottom: gameFrame?.getBoundingClientRect().bottom ?? 0,
-      controlsBottom: touchControls?.getBoundingClientRect().bottom ?? 0,
-      viewportHeight: window.innerHeight,
-      handheld: document.body.dataset.handheld,
-    };
-  });
-
-  expect(metrics.handheld).toBe("true");
-  expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
-  expect(metrics.panelBottom).toBeLessThanOrEqual(metrics.viewportHeight);
-  expect(metrics.frameBottom).toBeLessThanOrEqual(metrics.viewportHeight);
-  expect(metrics.controlsBottom).toBeLessThanOrEqual(metrics.viewportHeight);
+  for (const size of sizes) {
+    await expectHandheldLayoutFits(page, size.width, size.height);
+  }
 });
