@@ -11,141 +11,175 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
     <title>Number Gate Rush: 打怪救寶物</title>
-    <link rel="manifest" href="./manifest.webmanifest?v=20260313-100622" />
-    <link rel="icon" href="./icons/icon-192.svg?v=20260313-100622" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="./icons/icon-192.svg?v=20260313-100622" />
-    <link rel="stylesheet" href="./styles.css?v=20260313-100622" />
+    <link rel="manifest" href="./manifest.webmanifest?v=20260316-150500" />
+    <link rel="icon" href="./icons/icon-192.svg?v=20260316-150500" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.svg?v=20260316-150500" />
+    <link rel="stylesheet" href="./styles.css?v=20260316-150500" />
   </head>
   <body>
     <div class="app-chrome" aria-live="polite">
       <div class="app-chrome__identity">
         <span class="app-chrome__dot"></span>
         <div>
-          <strong>Number Gate Rush</strong>
-          <p id="app-mode-label">瀏覽器模式</p>
+          <strong class="sr-only">Number Gate Rush</strong>
+          <p id="app-mode-label" class="sr-only">瀏覽器模式</p>
         </div>
       </div>
       <div class="app-chrome__actions">
-        <span id="network-status" class="status-pill">連線中</span>
+        <a class="story-link" href="./world.html">世界觀</a>
+        <span id="network-status" class="status-pill status-pill--signal">連線中</span>
         <button id="install-button" class="secondary-button" type="button" hidden>安裝 App</button>
         <button id="update-button" class="secondary-button" type="button" hidden>更新內容</button>
       </div>
     </div>
     <main class="app-shell">
-      <section class="panel intro-panel">
-        <p class="eyebrow">Arcade Prototype</p>
-        <h1>Number Gate Rush: 打怪救寶物</h1>
-        <p class="intro-copy">
-          在星弧王國裡，五枚「數字核心」被裂界獸偷走，整個世界開始一層層坍塌。你要駕駛守門砲台穿越 5 個異世界，每一層各打完 20 關，並擊倒一隻有專屬能力的大魔王，總共突破 100 個劇情關卡，把核心帶回中央塔。
-        </p>
-        <div class="legend">
-          <span class="badge plus">晶核方塊：回收能量與劇情道具</span>
-          <span class="badge minus">裂界獸：任何一隻衝線都會讓防線崩潰</span>
-          <span class="badge neutral">每一層都會解鎖新武器，最後還要面對該層專屬 Boss</span>
-        </div>
-        <div class="story-arc-list" aria-label="Story arcs">
-          <article class="story-arc-card">
-            <strong>第 1 層 晨霧田野</strong>
-            <span>武器：曙光彈弓</span>
-          </article>
-          <article class="story-arc-card">
-            <strong>第 2 層 潮音港灣</strong>
-            <span>武器：潮汐連弩</span>
-          </article>
-          <article class="story-arc-card">
-            <strong>第 3 層 熔核裂谷</strong>
-            <span>武器：熔核破城砲</span>
-          </article>
-          <article class="story-arc-card">
-            <strong>第 4 層 極光觀測站</strong>
-            <span>武器：極光折射槍</span>
-          </article>
-          <article class="story-arc-card">
-            <strong>第 5 層 龍脈天穹</strong>
-            <span>武器：龍脈時序炮</span>
-          </article>
-        </div>
-        <div class="controls">
-          <span><kbd>A</kbd> / <kbd>←</kbd> 往左</span>
-          <span><kbd>D</kbd> / <kbd>→</kbd> 往右</span>
-          <span><kbd>↑</kbd> 大絕招</span>
-          <span><kbd>Space</kbd> 重開</span>
-        </div>
-        <p class="device-note">
-          手機可直接點畫面左右半邊切換跑道，或用下方大按鈕操作；平板與電腦可搭配鍵盤。
-        </p>
-        <button id="start-button" class="primary-button">開始遊戲</button>
-      </section>
-
       <section class="panel game-panel">
-        <header class="hud">
-          <div class="hud-block">
-            <span class="hud-label">隊伍</span>
-            <strong id="score-value">12</strong>
-          </div>
-          <div class="hud-block">
-            <span class="hud-label">關卡進度</span>
-            <strong id="stage-value">1 / 20</strong>
-          </div>
-          <div class="hud-block">
-            <span class="hud-label">章節</span>
-            <strong id="chapter-value">第 1 層</strong>
-          </div>
-          <div class="hud-block">
-            <span class="hud-label">最佳路線</span>
-            <strong id="hint-value">回收第一枚數字核心</strong>
-          </div>
-          <div class="hud-block">
-            <span class="hud-label">連擊</span>
-            <strong id="combo-value">0</strong>
-          </div>
-          <div class="hud-block">
-            <span class="hud-label">強化</span>
-            <strong id="boost-value">無</strong>
-          </div>
-          <div class="hud-block">
-            <span class="hud-label">大絕</span>
-            <strong id="ultimate-value">0%</strong>
-          </div>
-          <div class="hud-block">
-            <span class="hud-label">音量</span>
-            <input id="volume-slider" type="range" min="0" max="100" value="100" />
-          </div>
-        </header>
-
+        <div class="ui-hooks sr-only" aria-hidden="true">
+          <button id="start-button" type="button">開始遊戲</button>
+          <strong id="score-value">12</strong>
+          <strong id="stage-value">1 / 20</strong>
+          <strong id="chapter-value">第 1 層</strong>
+          <strong id="hint-value">先打爆第一個寶物方塊</strong>
+          <strong id="combo-value">0</strong>
+          <strong id="boost-value">無</strong>
+          <strong id="ultimate-value">0%</strong>
+          <input id="volume-slider" type="range" min="0" max="100" value="100" aria-label="音量" />
+        </div>
         <div class="play-area">
-          <div class="game-frame">
-            <canvas id="game" width="420" height="720" aria-label="Number Gate Rush"></canvas>
-            <div id="overlay" class="overlay">
-              <div class="overlay-card">
-                <p id="overlay-kicker" class="overlay-kicker">中央塔任務啟動</p>
-                <h2 id="overlay-title">穿越五層世界，奪回數字核心</h2>
-                <p id="overlay-text">
-                  守門砲台會自動射擊。先擋住裂界獸，再回收晶核方塊；每一層都有 20 關，推完整層才會切換世界背景並升級主武器。任何敵人衝線，整個遠征就會失敗。
-                </p>
-                <button id="restart-button" class="primary-button">開始</button>
+          <div class="play-stack">
+            <div class="layer-guide" aria-label="目前層級進度">
+              <div class="layer-guide__header">
+                <div class="layer-guide__badge">
+                  <span class="layer-guide__badge-icon" aria-hidden="true">
+                    <svg class="ui-icon" viewBox="0 0 32 32" role="presentation" aria-hidden="true">
+                      <path d="M6 20l10-12 10 12" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" />
+                      <path d="M9 18h14v7H9z" fill="#fff1cf" />
+                    </svg>
+                  </span>
+                  <strong id="layer-guide-current">1層</strong>
+                </div>
+                <div class="layer-guide__meter" aria-hidden="true">
+                  <span id="layer-guide-fill" class="layer-guide__fill"></span>
+                </div>
+                <strong id="layer-guide-stage" class="layer-guide__stage">1 / 20</strong>
+              </div>
+              <div id="layer-guide-dots" class="layer-guide__dots" aria-hidden="true">
+                <span class="layer-guide__dot" data-layer="1"></span>
+                <span class="layer-guide__dot" data-layer="2"></span>
+                <span class="layer-guide__dot" data-layer="3"></span>
+                <span class="layer-guide__dot" data-layer="4"></span>
+                <span class="layer-guide__dot" data-layer="5"></span>
               </div>
             </div>
-          </div>
-          <div class="touch-controls" aria-label="Touch controls">
-            <button id="left-button" class="touch-button" type="button" aria-label="往左移動">
-              <span class="touch-title">往左</span>
-              <span class="touch-hint">左半邊</span>
-            </button>
-            <button id="ultimate-button" class="touch-button ultimate-button" type="button" aria-label="施放大絕">
-              <span class="touch-title">大絕</span>
-              <span id="ultimate-cooldown" class="touch-cooldown">還要 100%</span>
-              <span class="touch-hint">電量滿就放</span>
-            </button>
-            <button id="right-button" class="touch-button" type="button" aria-label="往右移動">
-              <span class="touch-title">往右</span>
-              <span class="touch-hint">右半邊</span>
-            </button>
+            <div class="game-frame">
+              <canvas id="game" width="420" height="720" aria-label="Number Gate Rush"></canvas>
+              <div id="overlay" class="overlay">
+                <div class="overlay-card">
+                  <svg class="overlay-scene" viewBox="0 0 220 156" role="presentation" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="overlay-sky" x1="0" x2="1" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#fff9e7" />
+                        <stop offset="100%" stop-color="#e8f5ff" />
+                      </linearGradient>
+                      <linearGradient id="overlay-path" x1="0" x2="1">
+                        <stop offset="0%" stop-color="#7ea8ff" />
+                        <stop offset="55%" stop-color="#ffd467" />
+                        <stop offset="100%" stop-color="#ff8d70" />
+                      </linearGradient>
+                      <linearGradient id="overlay-portal" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#2c4fcb" />
+                        <stop offset="100%" stop-color="#355de3" />
+                      </linearGradient>
+                    </defs>
+                    <rect x="8" y="10" width="204" height="118" rx="30" fill="url(#overlay-sky)" />
+                    <rect x="26" y="28" width="168" height="82" rx="24" fill="#f6e38b" opacity="0.45" />
+                    <path d="M44 92c26-8 48-34 68-34 21 0 33 34 62 34" fill="none" stroke="url(#overlay-path)" stroke-linecap="round" stroke-width="14" />
+                    <g transform="translate(28 38)">
+                      <circle cx="28" cy="28" r="24" fill="#ffffff" stroke="#d6e5ff" stroke-width="5" />
+                      <circle cx="20" cy="24" r="4.5" fill="#3159d8" />
+                      <circle cx="36" cy="24" r="4.5" fill="#3159d8" />
+                      <path d="M18 35c6 6 20 6 26 0" fill="none" stroke="#3159d8" stroke-linecap="round" stroke-width="4.5" />
+                    </g>
+                    <g transform="translate(84 18)">
+                      <path d="M26 6l7 15 17 2-12 10 4 18-16-8-16 8 4-18L2 23l17-2z" fill="#ffd85d" />
+                      <circle cx="26" cy="30" r="7" fill="#fff7d4" />
+                    </g>
+                    <g transform="translate(140 38)">
+                      <circle cx="28" cy="28" r="24" fill="#fff4f1" stroke="#ffc4c7" stroke-width="5" />
+                      <circle cx="20" cy="24" r="4.5" fill="#cf364f" />
+                      <circle cx="36" cy="24" r="4.5" fill="#cf364f" />
+                      <path d="M17 37c8-5 14-6 22-3 4 1 7 3 9 5" fill="none" stroke="#cf364f" stroke-linecap="round" stroke-width="4.5" />
+                      <path d="M13 10l7 9M43 10l-7 9" fill="none" stroke="#cf364f" stroke-linecap="round" stroke-width="4" />
+                    </g>
+                    <g transform="translate(82 78)">
+                      <ellipse cx="28" cy="42" rx="30" ry="10" fill="#cedcf8" opacity="0.42" />
+                      <path d="M10 18h36l8 16-8 16H10L2 34z" fill="url(#overlay-portal)" />
+                      <rect x="16" y="22" width="24" height="8" rx="4" fill="#93d7ff" />
+                      <circle cx="20" cy="14" r="5" fill="#2c4fcb" />
+                      <circle cx="38" cy="14" r="5" fill="#2c4fcb" />
+                      <path d="M22 41h12" fill="none" stroke="#fff0c8" stroke-linecap="round" stroke-width="5" />
+                      <path d="M28 28l4 8-4 8-4-8z" fill="#8be8da" />
+                    </g>
+                    <g fill="#ffd467">
+                      <circle cx="56" cy="20" r="3" />
+                      <circle cx="170" cy="20" r="3" />
+                      <circle cx="120" cy="120" r="4" />
+                    </g>
+                  </svg>
+                  <p id="overlay-kicker" class="overlay-kicker sr-only">小砲台出發</p>
+                  <h2 id="overlay-title" class="sr-only">左右選邊，打怪拿寶物</h2>
+                  <p id="overlay-text" class="sr-only">
+                    小砲台會自動射擊。先擋住小怪獸，再打爆寶物方塊拿分數；每一層都有 20 關，最後還要打倒大怪獸。
+                  </p>
+                  <div class="overlay-dots" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <a class="story-link story-link--overlay" href="./world.html">查看世界觀設定</a>
+                  <button id="restart-button" class="primary-button" type="button" aria-label="開始">
+                    <svg class="ui-icon ui-icon--play-button" viewBox="0 0 64 64" role="presentation" aria-hidden="true">
+                      <circle cx="32" cy="32" r="26" fill="#fff1db" />
+                      <path d="M27 21l17 11-17 11z" fill="#ff7f51" />
+                    </svg>
+                    <span class="sr-only">開始</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="touch-controls" aria-label="Touch controls">
+              <button id="left-button" class="touch-button touch-button--left" type="button" aria-label="往左移動">
+                <svg class="ui-icon ui-icon--touch" viewBox="0 0 64 64" role="presentation" aria-hidden="true">
+                  <path d="M38 16L22 32l16 16" fill="none" stroke="#1d4ed8" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" />
+                  <path d="M24 32h18" fill="none" stroke="#1d4ed8" stroke-linecap="round" stroke-width="6" />
+                </svg>
+                <span class="touch-title sr-only">往左</span>
+                <span class="touch-hint sr-only">左半邊</span>
+              </button>
+              <button id="ultimate-button" class="touch-button touch-button--ultimate ultimate-button" type="button" aria-label="施放大絕">
+                <svg class="ui-icon ui-icon--touch" viewBox="0 0 64 64" role="presentation" aria-hidden="true">
+                  <circle cx="32" cy="32" r="12" fill="#fff1d6" />
+                  <path d="M32 7v9M32 48v9M7 32h9M48 32h9M14 14l6 6M44 44l6 6M14 50l6-6M44 20l6-6" fill="none" stroke="#fff5e8" stroke-linecap="round" stroke-width="4" />
+                  <circle cx="32" cy="32" r="8" fill="#ff8d3a" />
+                </svg>
+                <span class="touch-title sr-only">大絕</span>
+                <span id="ultimate-cooldown" class="touch-cooldown sr-only">還要 100%</span>
+                <span class="touch-hint sr-only">電量滿就放</span>
+              </button>
+              <button id="right-button" class="touch-button touch-button--right" type="button" aria-label="往右移動">
+                <svg class="ui-icon ui-icon--touch" viewBox="0 0 64 64" role="presentation" aria-hidden="true">
+                  <path d="M26 16l16 16-16 16" fill="none" stroke="#1d4ed8" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" />
+                  <path d="M40 32H22" fill="none" stroke="#1d4ed8" stroke-linecap="round" stroke-width="6" />
+                </svg>
+                <span class="touch-title sr-only">往右</span>
+                <span class="touch-hint sr-only">右半邊</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
-    <script src="./game.js?v=20260313-100622"></script>
+    <script src="./game.js?v=20260316-150500"></script>
   </body>
 </html>

@@ -15,6 +15,10 @@ const overlayText = document.getElementById("overlay-text");
 const scoreValue = document.getElementById("score-value");
 const stageValue = document.getElementById("stage-value");
 const chapterValue = document.getElementById("chapter-value");
+const layerGuideCurrent = document.getElementById("layer-guide-current");
+const layerGuideStage = document.getElementById("layer-guide-stage");
+const layerGuideFill = document.getElementById("layer-guide-fill");
+const layerGuideDots = Array.from(document.querySelectorAll(".layer-guide__dot"));
 const hintValue = document.getElementById("hint-value");
 const comboValue = document.getElementById("combo-value");
 const boostValue = document.getElementById("boost-value");
@@ -24,7 +28,8 @@ const appModeLabel = document.getElementById("app-mode-label");
 const networkStatus = document.getElementById("network-status");
 const installButton = document.getElementById("install-button");
 const updateButton = document.getElementById("update-button");
-const OFFLINE_CACHE_VERSION = "20260313-100622";
+const appChrome = document.querySelector(".app-chrome");
+const OFFLINE_CACHE_VERSION = "20260316-150500";
 const launchParams = new URLSearchParams(window.location.search);
 let deferredInstallPrompt = null;
 let waitingServiceWorker = null;
@@ -47,22 +52,21 @@ const BULLET_SPEED = 11;
 const FIRE_INTERVAL = 7;
 const BULLET_DAMAGE = 4;
 const MISS_PENALTY = 10;
-const COMBO_REWARD = 10;
+const COMBO_REWARD = 4;
 const BOSS_REWARD = { type: "mul", value: 2 };
 const RAPID_FIRE_DURATION = 320;
 const POWER_SHOT_DURATION = 220;
 const ELEMENT_DURATION = 260;
 const ULTIMATE_MAX = 100;
-const ULTIMATE_EMERGENCY_THRESHOLD = 40;
 const TREASURE_RUSH_DURATION = 240;
 const FACTION_NAME = "小砲台";
 const ITEM_NAME = "寶物方塊";
 const ENEMY_NAME = "小怪獸";
 const BOSS_NAME = "大怪獸";
-const WEAPON_FAMILY = "玩具元素砲";
+const WEAPON_FAMILY = "星弧祈禱砲";
 const ENEMY_TYPES = {
   runner: {
-    name: "衝刺怪",
+    name: "跳針犬",
     speed: 1.55,
     hpScale: 1.05,
     armor: 0,
@@ -73,7 +77,7 @@ const ENEMY_TYPES = {
     canDash: true,
   },
   tank: {
-    name: "硬殼怪",
+    name: "積城龜",
     speed: 0.78,
     hpScale: 1.85,
     armor: 2,
@@ -84,7 +88,7 @@ const ENEMY_TYPES = {
     canDash: false,
   },
   blob: {
-    name: "黏黏怪",
+    name: "裂滴獸",
     speed: 1.02,
     hpScale: 1.35,
     armor: 0,
@@ -96,7 +100,7 @@ const ENEMY_TYPES = {
     splits: true,
   },
   flyer: {
-    name: "飛飛怪",
+    name: "燈蛾",
     speed: 1.3,
     hpScale: 1.12,
     armor: 0,
@@ -107,7 +111,7 @@ const ENEMY_TYPES = {
     canDash: false,
   },
   mini: {
-    name: "小小怪",
+    name: "豆靈",
     speed: 1.42,
     hpScale: 0.72,
     armor: 0,
@@ -229,10 +233,10 @@ const STORY_ARCS = [
 const BOSS_PROFILES = [
   {
     name: "稻浪巨偶",
-    title: "晨霧田野守門獸",
-    abilityText: "會突然衝鋒壓線",
-    intro: "晨霧田野的核心守衛甦醒了，注意它的衝鋒節奏。",
-    defeat: "晨霧田野重新亮起，第一枚數字核心回到中央塔。",
+    title: "晨霧田野慈悲巨像",
+    abilityText: "慈祥外表下藏著重踏衝鋒",
+    intro: "稻浪巨偶醒來了。別被它溫柔的臉騙了，真正危險的是那股整片田野一起壓下來的衝勢。",
+    defeat: "晨霧田野重新發聲，第一位序數精靈被你平安帶回中央塔。",
     hp: 74,
     speedMultiplier: 1,
     breachDamage: 12,
@@ -247,10 +251,10 @@ const BOSS_PROFILES = [
   },
   {
     name: "潮鐘海蛇",
-    title: "潮音港灣深海王",
-    abilityText: "會生成護盾吃掉前排火力",
-    intro: "潮音港灣的深海王盤起潮盾，必須先拆掉它的外殼。",
-    defeat: "港灣警鐘安靜下來，第二枚數字核心已回收。",
+    title: "潮音港灣鐘潮主",
+    abilityText: "會鳴起潮盾，吞掉前排火力",
+    intro: "潮鐘海蛇從港灣抬起身體，像一整座鐘樓在呼吸。先拆掉那層潮盾，火力才進得去。",
+    defeat: "港灣鐘聲重新對齊節拍，第二位序數精靈回到了你的懷裡。",
     hp: 92,
     speedMultiplier: 0.88,
     breachDamage: 13,
@@ -265,10 +269,10 @@ const BOSS_PROFILES = [
   },
   {
     name: "熔核甲王",
-    title: "熔核裂谷鍛爐主",
-    abilityText: "自帶高護甲，火焰傷害較難燒穿",
-    intro: "裂谷鍛爐主全身包著熔殼，正面火力要更扎實。",
-    defeat: "熔核裂谷的火脈穩定下來，第三枚數字核心已收復。",
+    title: "熔核裂谷鍛爐王",
+    abilityText: "護甲厚得像一整座鍛爐牆",
+    intro: "熔核甲王拖著整身熔殼走了出來。這一戰沒有取巧，只有硬碰硬地把它的殼打碎。",
+    defeat: "裂谷火脈恢復平穩，第三位序數精靈終於從爐心裡被你帶走。",
     hp: 110,
     speedMultiplier: 0.8,
     breachDamage: 15,
@@ -282,10 +286,10 @@ const BOSS_PROFILES = [
   },
   {
     name: "極光鏡后",
-    title: "極光觀測站棱鏡主腦",
-    abilityText: "會左右漂移，雷射對她傷害較低",
-    intro: "極光鏡后展開折射軌道，射線必須跟上她的漂移。",
-    defeat: "觀測站的天幕恢復穩定，第四枚數字核心已同步返航。",
+    title: "極光觀測站鏡儀后",
+    abilityText: "像漂浮的儀式光學一樣左右移行",
+    intro: "極光鏡后展開她的折射儀翼。你不是在追一隻怪，而是在追一場有意志的光學儀式。",
+    defeat: "觀測站的天幕重新收束，第四位序數精靈沿著極光回航。",
     hp: 102,
     speedMultiplier: 0.92,
     breachDamage: 15,
@@ -300,10 +304,10 @@ const BOSS_PROFILES = [
   },
   {
     name: "龍脈裂界龍",
-    title: "龍脈天穹最終王",
-    abilityText: "會輪流衝鋒與展盾，是五層裡最硬的一隻",
-    intro: "最終裂界龍從天穹俯衝而下，這一層不會再有退路。",
-    defeat: "五枚數字核心全數回歸，星弧王國的裂縫被你關上了。",
+    title: "龍脈天穹裂空王",
+    abilityText: "衝鋒與展盾輪流切換，像天空本身在發怒",
+    intro: "龍脈裂界龍降了下來。這不是守關怪，是整片破裂天空想把你壓回地面的形狀。",
+    defeat: "五位序數精靈全數歸位，星弧王國的裂縫終於被你親手縫起來。",
     hp: 138,
     speedMultiplier: 0.9,
     breachDamage: 18,
@@ -480,11 +484,26 @@ function isHandheldLayout() {
   return window.matchMedia("(max-width: 1024px)").matches || window.matchMedia("(pointer: coarse)").matches;
 }
 
+function isCompactDesktopLayout() {
+  return (
+    !isHandheldLayout() &&
+    window.matchMedia("(pointer: fine)").matches &&
+    window.innerWidth >= 1100 &&
+    window.innerWidth <= 1460 &&
+    window.innerHeight <= 940
+  );
+}
+
 function updateAppChrome() {
   const standalone = isStandaloneMode();
   const handheld = isHandheldLayout();
+  const compactDesktop = isCompactDesktopLayout();
+  const appHeight = window.visualViewport?.height ?? window.innerHeight;
   document.body.dataset.displayMode = standalone ? "standalone" : "browser";
   document.body.dataset.handheld = handheld ? "true" : "false";
+  document.body.dataset.compactDesktop = compactDesktop ? "true" : "false";
+  document.documentElement.style.setProperty("--app-height", `${appHeight}px`);
+  document.documentElement.style.setProperty("--app-chrome-height", `${appChrome?.offsetHeight ?? 0}px`);
 
   if (appModeLabel) {
     appModeLabel.textContent = handheld ? (standalone ? "App 模式" : "瀏覽器模式") : "桌面網頁";
@@ -525,8 +544,10 @@ function initAppExperience() {
   window.matchMedia("(display-mode: fullscreen)").addEventListener("change", updateAppChrome);
   window.matchMedia("(max-width: 1024px)").addEventListener("change", updateAppChrome);
   window.matchMedia("(pointer: coarse)").addEventListener("change", updateAppChrome);
+  window.matchMedia("(pointer: fine)").addEventListener("change", updateAppChrome);
   window.addEventListener("online", updateAppChrome);
   window.addEventListener("offline", updateAppChrome);
+  window.addEventListener("resize", updateAppChrome);
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
@@ -814,14 +835,6 @@ function createReward(depth, highValue = false, theme = getStoryArc(depth)) {
 }
 
 function createPerk(depth, highValue = false, theme = getStoryArc(depth)) {
-  const roll = Math.random();
-  if (highValue && roll < 0.15 + theme.perkBias) return "laser";
-  if (highValue && roll < 0.29 + theme.perkBias) return "power";
-  if (highValue && roll < 0.43 + theme.perkBias) return "fire";
-  if (roll < 0.08 + theme.layer * 0.01) return "shield";
-  if (roll < 0.14 + theme.layer * 0.015 + theme.perkBias * 0.5) return "rapid";
-  if (roll < 0.19 + theme.layer * 0.016 + theme.perkBias * 0.6) return "ice";
-  if (roll < 0.24 + theme.layer * 0.016 + theme.perkBias * 0.8) return "poison";
   return null;
 }
 
@@ -909,6 +922,61 @@ function describeStage(index, fallback) {
   return `${arc.name}・${script.title}：${script.objective || fallback}`;
 }
 
+function formatLaneChoice(block) {
+  if (!block || block.entityType !== "item") return "";
+  return `${block.lane === 0 ? "左" : "右"}邊 ${block.hp}血 ${formatReward(block.reward)}`;
+}
+
+function buildRowHint(blocks) {
+  const items = blocks.filter((block) => block.entityType === "item");
+  const enemies = blocks.filter((block) => block.entityType === "enemy");
+  if (items.length === 2) {
+    const sortedItems = [...items].sort((a, b) => a.hp - b.hp || a.rewardValue - b.rewardValue);
+    return `${formatLaneChoice(sortedItems[0])}，${formatLaneChoice(sortedItems[1])}`;
+  }
+  if (items.length === 1 && enemies.length === 1) {
+    const item = items[0];
+    const enemy = enemies[0];
+    return `${enemy.lane === 0 ? "左" : "右"}邊先擋${ENEMY_NAME}，${item.lane === 0 ? "左" : "右"}邊再拿 ${formatReward(item.reward)}`;
+  }
+  if (items.length === 1) {
+    return `${formatLaneChoice(items[0])}`;
+  }
+  return `${ENEMY_NAME}靠近了`;
+}
+
+function getPreferredSafeLane(index, fallbackLane = 0) {
+  if (index < 3) return fallbackLane;
+  return Math.random() < 0.5 ? 0 : 1;
+}
+
+function createGuardedTreasureRow(index, options = {}) {
+  const theme = getStoryArc(index);
+  const script = getLevelScript(index);
+  const arcProgress = getArcProgress(index);
+  const itemLane = options.itemLane ?? getPreferredSafeLane(index, 0);
+  const enemyLane = itemLane === 0 ? 1 : 0;
+  const itemHp = 5 + theme.layer + Math.floor(arcProgress * 6) + (options.highValue ? 2 : 0);
+  const reward = createReward(index + (options.highValue ? 1 : 0), Boolean(options.highValue), theme);
+  const item = createItemBlock(itemLane, itemHp, reward, {
+    big: reward.type === "mul" || reward.value >= 8,
+    superCrystal: Boolean(options.highValue),
+  });
+  item.perk = options.perk ?? createPerk(index, Boolean(options.highValue), theme);
+  const enemy = createEnemyBlock(index + 1, enemyLane, {
+    preferFast: true,
+    theme,
+    forcedType: options.forcedEnemy ?? null,
+    elite: Boolean(options.elite),
+  });
+  return {
+    index,
+    hint: buildRowHint([item, enemy]),
+    storyTitle: script.title,
+    blocks: [item, enemy],
+  };
+}
+
 function createSingleRow(index, lane, options = {}) {
   const theme = getStoryArc(index);
   const script = getLevelScript(index);
@@ -919,7 +987,7 @@ function createSingleRow(index, lane, options = {}) {
   block.perk = options.perk ?? createPerk(index, false, theme);
   return {
     index,
-    hint: describeStage(index, `${theme.name}的第一批補給到了`),
+    hint: buildRowHint([block]),
     storyTitle: script.title,
     blocks: [block],
   };
@@ -933,8 +1001,8 @@ function createDualRow(index, options = {}) {
   const highLane = lowLane === 0 ? 1 : 0;
   const lowHp = 5 + theme.layer + Math.floor(arcProgress * 7) + Math.floor(Math.random() * 2);
   const highHp = lowHp + 3 + Math.floor(Math.random() * 3);
-  const lowBlock = createItemBlock(lowLane, lowHp, createReward(index, false, theme), { big: true });
-  const highBlock = createItemBlock(highLane, highHp, createReward(index + 1, true, theme), {
+  const lowBlock = createItemBlock(lowLane, lowHp, { type: "add", value: 7 + theme.layer + Math.floor(arcProgress * 4) }, { big: true });
+  const highBlock = createItemBlock(highLane, highHp, { type: "mul", value: Number((1.5 + theme.layer * 0.06 + arcProgress * 0.1).toFixed(1)) }, {
     big: true,
     superCrystal: true,
   });
@@ -942,56 +1010,37 @@ function createDualRow(index, options = {}) {
   highBlock.perk = options.perkHigh ?? createPerk(index, true, theme);
   return {
     index,
-    hint: describeStage(index, `${theme.name}的雙側補給同步出現`),
+    hint: buildRowHint([lowBlock, highBlock]),
     storyTitle: script.title,
     blocks: [lowBlock, highBlock],
   };
 }
 
 function createEnemyRow(index, lane, options = {}) {
-  const theme = getStoryArc(index);
-  const script = getLevelScript(index);
-  const enemy = createEnemyBlock(index, lane, {
-    preferFast: true,
-    theme,
-    forcedType: options.forcedEnemy ?? null,
+  return createGuardedTreasureRow(index, {
+    itemLane: lane === 0 ? 1 : 0,
+    forcedEnemy: options.forcedEnemy ?? null,
     elite: options.elite ?? false,
+    perk: options.perk ?? null,
   });
-  return {
-    index,
-    hint: describeStage(index, `${enemy.enemyStats.name}來了，沒打掉就直接輸`),
-    storyTitle: script.title,
-    blocks: [enemy],
-  };
 }
 
 function createDoubleEnemyRow(index, options = {}) {
-  const theme = getStoryArc(index);
-  const script = getLevelScript(index);
-  const forcedLeft = Array.isArray(options.forcedEnemy) ? options.forcedEnemy[0] : null;
-  const forcedRight = Array.isArray(options.forcedEnemy) ? options.forcedEnemy[1] : null;
-  const leftEnemy = createEnemyBlock(index + 1, 0, { preferFast: true, theme, forcedType: forcedLeft });
-  const rightEnemy = createEnemyBlock(index + 2, 1, { preferFast: true, theme, forcedType: forcedRight });
-  return {
-    index,
-    hint: describeStage(index, `${leftEnemy.enemyStats.name}和${rightEnemy.enemyStats.name}一起衝下來了`),
-    storyTitle: script.title,
-    blocks: [leftEnemy, rightEnemy],
-  };
+  return createMixedRow(index, {
+    enemyLane: 0,
+    forcedEnemy: Array.isArray(options.forcedEnemy) ? options.forcedEnemy[0] : options.forcedEnemy ?? null,
+    perk: options.perk ?? null,
+  });
 }
 
 function createEliteEnemyRow(index, options = {}) {
-  const theme = getStoryArc(index);
-  const script = getLevelScript(index);
-  const lane = Math.random() < 0.5 ? 0 : 1;
-  const forcedType = options.forcedEnemy ?? randomChoice(["tank", "runner", "flyer"]);
-  const enemy = createEnemyBlock(index + 2, lane, { preferFast: true, forcedType, elite: true, theme });
-  return {
-    index,
-    hint: describeStage(index, `精英${enemy.enemyStats.name}來了，先把它打掉`),
-    storyTitle: script.title,
-    blocks: [enemy],
-  };
+  return createGuardedTreasureRow(index, {
+    itemLane: getPreferredSafeLane(index, 1),
+    forcedEnemy: options.forcedEnemy ?? randomChoice(["tank", "runner", "flyer"]),
+    elite: true,
+    highValue: true,
+    perk: options.perk ?? null,
+  });
 }
 
 function createMixedRow(index, options = {}) {
@@ -1009,7 +1058,7 @@ function createMixedRow(index, options = {}) {
   item.perk = options.perk ?? createPerk(index + 1, true, theme);
   return {
     index,
-    hint: describeStage(index, `${enemy.enemyStats.name}優先，安全後再回收${ITEM_NAME}`),
+    hint: buildRowHint([enemy, item]),
     storyTitle: script.title,
     blocks: [enemy, item],
   };
@@ -1019,11 +1068,13 @@ function createJackpotRow(index, options = {}) {
   const theme = getStoryArc(index);
   const script = getLevelScript(index);
   const arcProgress = getArcProgress(index);
-  const leftBlock = createItemBlock(0, 6 + theme.layer + Math.floor(arcProgress * 6), createReward(index + 2, true, theme), {
+  const lowLane = Math.random() < 0.5 ? 0 : 1;
+  const highLane = lowLane === 0 ? 1 : 0;
+  const leftBlock = createItemBlock(lowLane, 6 + theme.layer + Math.floor(arcProgress * 4), { type: "add", value: 9 + theme.layer + Math.floor(arcProgress * 5) }, {
     big: true,
-    superCrystal: true,
+    superCrystal: false,
   });
-  const rightBlock = createItemBlock(1, 8 + theme.layer + Math.floor(arcProgress * 7), createReward(index + 3, true, theme), {
+  const rightBlock = createItemBlock(highLane, 10 + theme.layer + Math.floor(arcProgress * 5), { type: "mul", value: Number((1.7 + theme.layer * 0.08 + arcProgress * 0.14).toFixed(1)) }, {
     big: true,
     superCrystal: true,
   });
@@ -1031,7 +1082,7 @@ function createJackpotRow(index, options = {}) {
   rightBlock.perk = options.perkHigh ?? createPerk(index + 2, true, theme);
   return {
     index,
-    hint: describeStage(index, "寶藏雨來了，這排超肥"),
+    hint: buildRowHint([leftBlock, rightBlock]),
     storyTitle: script.title,
     blocks: [leftBlock, rightBlock],
   };
@@ -1054,7 +1105,7 @@ function createGauntletRow(index, options = {}) {
   item.perk = options.perk ?? randomChoice(["laser", "power", "fire", "ice", "poison"]);
   return {
     index,
-    hint: describeStage(index, "先扛住猛怪，再拿超值寶藏"),
+    hint: buildRowHint([enemy, item]),
     storyTitle: script.title,
     blocks: [enemy, item],
   };
@@ -1128,8 +1179,7 @@ function hideOverlay() {
 }
 
 function getCurrentHint() {
-  if (state.treasureRushFrames > 0) return `寶藏狂熱中，現在打寶物更賺`;
-  if (state.bossActive && state.boss) return `${state.boss.name}：${state.boss.abilityText}`;
+  if (state.bossActive && state.boss) return `${BOSS_NAME}快到了，先把血量打到 0`;
   if (state.currentRow) return state.currentRow.hint;
   return `${FACTION_NAME}出發`;
 }
@@ -1143,25 +1193,8 @@ function getElementMode() {
 }
 
 function getWeaponTitle() {
-  const arc = getCurrentStoryArc();
-  const elementMode = getElementMode();
-  const baseMode = state.powerShotFrames > 0 ? "重砲" : state.rapidFireFrames > 0 ? "快射" : "";
-  const elementTitle =
-    elementMode === "laser"
-      ? "雷射"
-      : elementMode === "fire"
-        ? "火焰"
-        : elementMode === "ice"
-          ? "冰霜"
-        : elementMode === "poison"
-            ? "毒泡"
-            : "";
-  if (state.treasureRushFrames > 0) return `${arc.weaponName}・寶藏狂熱 ${Math.ceil(state.treasureRushFrames / 30)}`;
-  if (baseMode && elementTitle) return `${arc.weaponName}・${baseMode}+${elementTitle}`;
-  if (baseMode) return `${arc.weaponName}・${baseMode}`;
-  if (elementTitle) return `${arc.weaponName}・${elementTitle}`;
   if (state.shieldCharges > 0) return `護盾×${state.shieldCharges}`;
-  return arc.weaponName;
+  return "普通射擊";
 }
 
 function getDangerActive() {
@@ -1174,8 +1207,7 @@ function getDangerActive() {
 }
 
 function gainUltimateCharge(amount) {
-  const bonus = getCurrentStoryArc().weaponMode === "power" ? 1.18 : 1;
-  state.ultimateCharge = Math.min(ULTIMATE_MAX, state.ultimateCharge + amount * bonus * 1.12);
+  state.ultimateCharge = Math.min(ULTIMATE_MAX, state.ultimateCharge + amount * 0.55);
 }
 
 function consumeShieldCharge(label = "護盾擋下了") {
@@ -1189,9 +1221,7 @@ function consumeShieldCharge(label = "護盾擋下了") {
 }
 
 function canUseUltimate() {
-  if (!state.running) return false;
-  if (state.ultimateCharge >= ULTIMATE_MAX) return true;
-  return state.ultimateCharge >= ULTIMATE_EMERGENCY_THRESHOLD && getDangerActive();
+  return state.running && state.ultimateCharge >= ULTIMATE_MAX;
 }
 
 function getUltimateProgress() {
@@ -1202,19 +1232,31 @@ function getUltimateChargeRemaining() {
   return Math.max(0, ULTIMATE_MAX - getUltimateProgress());
 }
 
+function updateLayerGuide() {
+  const arc = getCurrentStoryArc();
+  const stageInArc = getCurrentStageInArc();
+  const progress = Math.max(5, Math.min(100, (stageInArc / STAGES_PER_ARC) * 100));
+
+  if (layerGuideCurrent) layerGuideCurrent.textContent = `第${arc.layer}層`;
+  if (layerGuideStage) layerGuideStage.textContent = `${stageInArc} / ${STAGES_PER_ARC}`;
+  if (layerGuideFill) layerGuideFill.style.width = `${progress}%`;
+
+  layerGuideDots.forEach((dot, index) => {
+    const layerNumber = index + 1;
+    let stateLabel = "upcoming";
+    if (layerNumber < arc.layer) stateLabel = "done";
+    if (layerNumber === arc.layer) stateLabel = "current";
+    dot.dataset.state = stateLabel;
+  });
+}
+
 function triggerScreenShake(frames, power) {
   state.shakeFrames = Math.max(state.shakeFrames, frames);
   state.shakePower = Math.max(state.shakePower, power);
 }
 
 function activateTreasureRush(x = W / 2, y = PLAYER_COLLISION_Y - 80) {
-  state.treasureRushFrames = TREASURE_RUSH_DURATION;
-  state.rapidFireFrames = Math.max(state.rapidFireFrames, 150);
-  state.powerShotFrames = Math.max(state.powerShotFrames, 110);
-  gainUltimateCharge(18);
-  state.message += "  Treasure Rush!";
-  pushFloater("TREASURE RUSH!", x, y, "#fde68a");
-  triggerScreenShake(12, 8);
+  return;
 }
 
 function updateHud() {
@@ -1229,6 +1271,7 @@ function updateHud() {
   comboValue.textContent = `${state.combo}`;
   boostValue.textContent = getWeaponTitle();
   ultimateValue.textContent = ultimateReady ? "READY!" : `還要 ${ultimateRemaining}%`;
+  updateLayerGuide();
   if (ultimateButton) {
     ultimateButton.disabled = !ultimateReady;
     ultimateButton.dataset.ready = ultimateReady ? "true" : "false";
@@ -1239,9 +1282,7 @@ function updateHud() {
   }
   const hint = ultimateReady
     ? "現在可施放"
-    : ultimateProgress >= ULTIMATE_EMERGENCY_THRESHOLD
-      ? "危急時可提前放"
-      : `已充能 ${ultimateProgress}%`;
+    : `已充能 ${ultimateProgress}%`;
   if (ultimateHintLabel) ultimateHintLabel.textContent = hint;
 }
 
@@ -1277,38 +1318,7 @@ function setElementMode(mode) {
 }
 
 function applyPerk(block) {
-  if (!block.perk) return;
-  playSfx("perk");
-  if (block.perk === "rapid") {
-    state.rapidFireFrames = RAPID_FIRE_DURATION;
-    state.message += "  快射啟動";
-    pushFloater("快射", LANES[block.lane], state.currentRowY - 44, "#7dd3fc");
-  } else if (block.perk === "power") {
-    state.powerShotFrames = POWER_SHOT_DURATION;
-    state.message += "  重砲啟動";
-    pushFloater("重砲", LANES[block.lane], state.currentRowY - 44, "#f59e0b");
-  } else if (block.perk === "fire") {
-    setElementMode("fire");
-    state.message += "  火焰玩具砲";
-    pushFloater("火焰", LANES[block.lane], state.currentRowY - 44, "#fb923c");
-  } else if (block.perk === "laser") {
-    setElementMode("laser");
-    state.message += "  彩虹雷射砲";
-    pushFloater("雷射", LANES[block.lane], state.currentRowY - 44, "#93c5fd");
-  } else if (block.perk === "ice") {
-    setElementMode("ice");
-    state.message += "  冰冰霜凍砲";
-    pushFloater("冰霜", LANES[block.lane], state.currentRowY - 44, "#67e8f9");
-  } else if (block.perk === "poison") {
-    setElementMode("poison");
-    state.message += "  黏黏毒泡砲";
-    pushFloater("毒泡", LANES[block.lane], state.currentRowY - 44, "#86efac");
-  } else if (block.perk === "shield") {
-    state.shieldCharges = Math.min(3, state.shieldCharges + 1);
-    state.message += "  護盾 +1";
-    pushFloater(`護盾 ${state.shieldCharges}/3`, LANES[block.lane], state.currentRowY - 44, "#a78bfa");
-  }
-  updateHud();
+  return;
 }
 
 function pushFloater(text, x, y, color = "#ffffff") {
@@ -1458,29 +1468,6 @@ function pushUltimateBurst() {
 }
 
 function applyCrystalPower(block) {
-  if (block.entityType !== "item") return "";
-
-  if (block.crystalColor === "green") {
-    const bonus = Math.max(8, Math.round(block.reward.value * 0.8));
-    state.troop = clampTroop(state.troop + bonus);
-    pushFloater(`綠晶+${bonus}`, LANES[block.lane], state.currentRowY - 44, "#4ade80");
-    return `  綠晶爆發 +${bonus}`;
-  }
-
-  if (block.crystalColor === "red") {
-    state.powerShotFrames += 180;
-    state.fireAmmoFrames = Math.max(state.fireAmmoFrames, 180);
-    pushFloater("紅晶爆發", LANES[block.lane], state.currentRowY - 44, "#f87171");
-    return "  紅晶爆發";
-  }
-
-  if (block.crystalColor === "blue") {
-    state.laserAmmoFrames = Math.max(state.laserAmmoFrames, 180);
-    state.rapidFireFrames += 120;
-    pushFloater("藍晶充能", LANES[block.lane], state.currentRowY - 44, "#60a5fa");
-    return "  藍晶充能";
-  }
-
   return "";
 }
 
@@ -1512,7 +1499,7 @@ function startGame() {
   state.frameCount = 0;
   state.treasureRushFrames = 0;
   state.pickupChain = 0;
-  state.message = `${openingArc.name}啟程：${openingStage.title}`;
+  state.message = `${FACTION_NAME}出發：${openingStage.title}`;
   resetCombatState();
   state.backgroundDrift = 0;
   audio.nextBgmTime = audio.ctx ? audio.ctx.currentTime : 0;
@@ -1531,7 +1518,7 @@ function finishGame(win, kicker, text) {
   playSfx(win ? "win" : "lose");
   setOverlay(
     kicker,
-    win ? `${BOSS_NAME}被打倒了` : `${FACTION_NAME}被撞倒了`,
+    win ? `${BOSS_NAME}被打倒了` : `${FACTION_NAME}沒守住`,
     `${text}  最高隊伍 ${state.bestScore}，最遠關卡 ${state.bestStage}。`,
     "再玩一次",
   );
@@ -1646,7 +1633,7 @@ function missCurrentRow() {
   state.combo = 0;
   state.pickupChain = 0;
   state.troop = clampTroop(state.troop - Math.min(MISS_PENALTY, 4 + getCurrentStoryArc().layer));
-  state.message = `${ITEM_NAME}漏接 -${Math.min(MISS_PENALTY, 4 + getCurrentStoryArc().layer)}`;
+  state.message = `${ITEM_NAME}漏掉了 -${Math.min(MISS_PENALTY, 4 + getCurrentStoryArc().layer)}`;
   pushFloater("MISS ITEM", W / 2, PLAYER_COLLISION_Y - 20, "#94a3b8");
   for (const block of state.currentRow.blocks) {
     if (block.state === "falling" && block.entityType === "item") block.state = "missed";
@@ -1705,14 +1692,14 @@ function splitEnemy(target, x, y) {
 function finishEnemyBreak(target, x, y) {
   if (target.enemyStats?.splits && !target.hasSplit) {
     splitEnemy(target, x, y);
-    state.message = `${target.lane === 0 ? "左" : "右"}${ENEMY_NAME}分裂了`;
+    state.message = `${target.lane === 0 ? "左" : "右"}邊${ENEMY_NAME}分裂了`;
     return;
   }
   target.state = "broken";
   target.breakFrames = 14;
   playSfx("enemyBreak");
   gainUltimateCharge(target.isElite ? 40 : 28);
-  state.message = `${target.lane === 0 ? "左" : "右"}${ENEMY_NAME}擊破`;
+  state.message = `${target.lane === 0 ? "左" : "右"}邊${ENEMY_NAME}擊破`;
   pushFloater("CLEAR", x, y - 18, "#fca5a5");
   const elementMode = getElementMode() ?? getBaseWeaponMode();
   const explosionStyle =
@@ -1822,7 +1809,7 @@ function updateBossStatusEffects() {
     state.currentRowY = ROW_START_Y;
     state.currentRowResolved = false;
     state.flashFrames = 18;
-    state.message = `${nextArc.name}開門，主武器升級為${nextArc.weaponName}`;
+    state.message = `第 ${nextArc.layer} 層開始，武器換成${nextArc.weaponName}`;
     pushFloater(nextArc.weaponName, W / 2, PLAYER_COLLISION_Y - 56, "#fde68a");
     updateHud();
   }
@@ -1984,7 +1971,7 @@ function updateCurrentRow() {
     (block) => block.entityType === "enemy" && block.state === "falling" && state.currentRowY >= PLAYER_COLLISION_Y,
   );
   if (enemyBrokeThrough) {
-    if (consumeShieldCharge("護盾擋住了裂界獸")) {
+    if (consumeShieldCharge(`護盾擋住了${ENEMY_NAME}`)) {
       for (const block of state.currentRow.blocks) {
         if (block.entityType === "enemy" && block.state === "falling") {
           block.state = "broken";
@@ -1995,7 +1982,7 @@ function updateCurrentRow() {
       return;
     }
     state.combo = 0;
-    state.message = `${ENEMY_NAME}突破`;
+    state.message = `${ENEMY_NAME}突破防線`;
     pushFloater("BREACH", W / 2, PLAYER_COLLISION_Y - 20, "#ef476f");
     updateHud();
     finishGame(false, "失敗", `${ENEMY_NAME}跑到底了，這局沒有守住。`);
@@ -2500,6 +2487,462 @@ function drawStatusEffects(width, height, target) {
   }
 }
 
+function drawFace(eyeOffset, eyeY, blink, mood = "happy") {
+  ctx.fillStyle = "#fffaf4";
+  if (blink) {
+    ctx.fillRect(-eyeOffset - 8, eyeY, 16, 3);
+    ctx.fillRect(eyeOffset - 8, eyeY, 16, 3);
+  } else {
+    ctx.beginPath();
+    ctx.ellipse(-eyeOffset, eyeY, 8, 9, 0, 0, Math.PI * 2);
+    ctx.ellipse(eyeOffset, eyeY, 8, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#23304d";
+    ctx.beginPath();
+    ctx.arc(-eyeOffset + 1, eyeY + 1, 3.2, 0, Math.PI * 2);
+    ctx.arc(eyeOffset + 1, eyeY + 1, 3.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.strokeStyle = "#23304d";
+  ctx.lineWidth = 4;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  if (mood === "angry") {
+    ctx.moveTo(-18, 18);
+    ctx.quadraticCurveTo(0, 6, 18, 18);
+  } else if (mood === "surprised") {
+    ctx.arc(0, 18, 7, 0, Math.PI * 2);
+  } else if (mood === "calm") {
+    ctx.moveTo(-16, 16);
+    ctx.quadraticCurveTo(0, 21, 16, 16);
+  } else {
+    ctx.moveTo(-18, 14);
+    ctx.quadraticCurveTo(0, 28, 18, 14);
+  }
+  ctx.stroke();
+}
+
+function drawBlockStuds(width, height, count = 2, color = "#3a4862") {
+  ctx.fillStyle = color;
+  for (let i = 0; i < count; i += 1) {
+    const x = count === 1 ? 0 : -width * 0.26 + (width * 0.52 * i) / (count - 1);
+    ctx.beginPath();
+    ctx.arc(x, -height / 2 + 18, 6.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawItemBlockCharacter(width, height, block, preview) {
+  const mood =
+    block.rewardType === "mul" ? "surprised" : block.crystalColor === "red" ? "angry" : block.crystalColor === "blue" ? "calm" : "happy";
+  const eyeOffset = preview ? 14 : 18;
+  const eyeY = preview ? -8 : -10;
+
+  if (block.crystalColor === "green") {
+    ctx.fillStyle = "#7eb5a2";
+    ctx.beginPath();
+    ctx.moveTo(-10, -height / 2 + 4);
+    ctx.quadraticCurveTo(-4, -height / 2 - 10, 2, -height / 2 + 2);
+    ctx.quadraticCurveTo(-3, -height / 2 + 6, -10, -height / 2 + 4);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(10, -height / 2 + 4);
+    ctx.quadraticCurveTo(4, -height / 2 - 10, -2, -height / 2 + 2);
+    ctx.quadraticCurveTo(3, -height / 2 + 6, 10, -height / 2 + 4);
+    ctx.fill();
+  } else if (block.crystalColor === "red") {
+    ctx.strokeStyle = "#b5675b";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(-22, -height / 2 + 12);
+    ctx.lineTo(-10, -height / 2 - 4);
+    ctx.moveTo(22, -height / 2 + 12);
+    ctx.lineTo(10, -height / 2 - 4);
+    ctx.stroke();
+  } else if (block.crystalColor === "blue") {
+    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    roundedRectPath(ctx, -26, -4, 52, 20, 10);
+    ctx.fill();
+  }
+
+  if (block.rewardType === "mul") {
+    ctx.fillStyle = "#f3ebdc";
+    ctx.beginPath();
+    ctx.moveTo(0, -height / 2 - 4);
+    ctx.lineTo(8, 2 - height / 2);
+    ctx.lineTo(0, 12 - height / 2);
+    ctx.lineTo(-8, 2 - height / 2);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  drawFace(eyeOffset, eyeY, false, mood);
+}
+
+function drawItemStackCharacter(width, height, block, active, preview, palette) {
+  const dark = "#4c6079";
+  const main = block.hitFlash > 0 ? "#ffffff" : palette.fill;
+  const scale = preview ? 0.78 : 1;
+  const bodyW = width * 0.24 * scale;
+  const bodyH = height * 0.46 * scale;
+
+  ctx.fillStyle = "rgba(255,248,224,0.18)";
+  ctx.beginPath();
+  ctx.ellipse(0, 14, width * 0.2, height * 0.14, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = main;
+  ctx.beginPath();
+  ctx.moveTo(0, -bodyH * 0.86);
+  ctx.lineTo(bodyW, -bodyH * 0.18);
+  ctx.lineTo(0, bodyH * 0.68);
+  ctx.lineTo(-bodyW, -bodyH * 0.18);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = dark;
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  ctx.strokeStyle = block.rewardType === "mul" ? "#f1c668" : dark;
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-bodyW * 0.8, -bodyH * 0.8);
+  ctx.lineTo(-bodyW * 1.18, -bodyH * 1.1);
+  ctx.moveTo(bodyW * 0.8, -bodyH * 0.8);
+  ctx.lineTo(bodyW * 1.18, -bodyH * 1.1);
+  ctx.moveTo(0, -bodyH * 0.96);
+  ctx.lineTo(0, -bodyH * 1.34);
+  ctx.stroke();
+
+  ctx.fillStyle = "#fffdf6";
+  ctx.beginPath();
+  ctx.arc(-bodyW * 0.36, -bodyH * 0.1, 6, 0, Math.PI * 2);
+  ctx.arc(bodyW * 0.36, -bodyH * 0.1, 6, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = dark;
+  ctx.beginPath();
+  ctx.arc(-bodyW * 0.26, -bodyH * 0.04, 2.4, 0, Math.PI * 2);
+  ctx.arc(bodyW * 0.46, -bodyH * 0.04, 2.4, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = dark;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-bodyW * 0.34, bodyH * 0.18);
+  ctx.quadraticCurveTo(0, bodyH * 0.34, bodyW * 0.34, bodyH * 0.18);
+  ctx.stroke();
+}
+
+function drawSingleStud(x, y, r, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawBlockSegment(x, y, w, h, radius, fill, stroke, highlight = true) {
+  ctx.fillStyle = fill;
+  roundedRectPath(ctx, x, y, w, h, radius);
+  ctx.fill();
+
+  if (highlight) {
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    roundedRectPath(ctx, x + 5, y + 5, w - 10, Math.max(10, h * 0.24), Math.max(6, radius - 4));
+    ctx.fill();
+  }
+
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 3;
+  roundedRectPath(ctx, x + 1.5, y + 1.5, w - 3, h - 3, Math.max(4, radius - 2));
+  ctx.stroke();
+}
+
+function drawEnemyLegs(points, stroke) {
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  for (const [sx, sy, ex, ey] of points) {
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(ex, ey);
+  }
+  ctx.stroke();
+}
+
+function drawEnemyBlockCharacter(width, height, block, enemyType, preview, palette) {
+  const blink = Math.sin((state.backgroundDrift + width) * 0.18) > 0.92 && !preview;
+  const dark = palette.deep;
+  const eyeWhite = "#fff7f2";
+  const pupil = "#302246";
+
+  if (enemyType === "runner") {
+    ctx.rotate(-0.18);
+    ctx.fillStyle = palette.fill;
+    ctx.beginPath();
+    ctx.moveTo(-width * 0.34, height * 0.1);
+    ctx.quadraticCurveTo(-width * 0.3, -height * 0.28, -width * 0.04, -height * 0.4);
+    ctx.quadraticCurveTo(width * 0.22, -height * 0.52, width * 0.38, -height * 0.22);
+    ctx.quadraticCurveTo(width * 0.42, 0, width * 0.1, height * 0.14);
+    ctx.quadraticCurveTo(-width * 0.1, height * 0.22, -width * 0.34, height * 0.1);
+    ctx.fill();
+    ctx.strokeStyle = dark;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-2, -height * 0.42);
+    ctx.lineTo(-12, -height * 0.64);
+    ctx.moveTo(26, -height * 0.34);
+    ctx.lineTo(42, -height * 0.54);
+    ctx.stroke();
+    ctx.fillStyle = eyeWhite;
+    if (blink) {
+      ctx.fillRect(-2, -10, 16, 3);
+      ctx.fillRect(20, -16, 18, 3);
+    } else {
+      ctx.beginPath();
+      ctx.ellipse(4, -8, 8, 10, 0, 0, Math.PI * 2);
+      ctx.ellipse(28, -14, 9, 11, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = pupil;
+      ctx.beginPath();
+      ctx.arc(6, -7, 3.5, 0, Math.PI * 2);
+      ctx.arc(30, -13, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.strokeStyle = pupil;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(-6, 12);
+    ctx.quadraticCurveTo(12, -4, 30, 6);
+    ctx.stroke();
+    if (!preview) {
+      drawEnemyLegs(
+        [
+          [-18, height * 0.08, -34, height * 0.4],
+          [0, height * 0.14, -12, height * 0.46],
+          [18, height * 0.08, 30, height * 0.3],
+        ],
+        dark,
+      );
+    }
+    return;
+  }
+
+  if (enemyType === "tank") {
+    ctx.fillStyle = palette.fill;
+    roundedRectPath(ctx, -width * 0.38, -height * 0.02, width * 0.76, height * 0.38, 24);
+    ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.22)";
+    roundedRectPath(ctx, -width * 0.26, -height * 0.32, width * 0.22, height * 0.22, 12);
+    ctx.fill();
+    roundedRectPath(ctx, width * 0.04, -height * 0.34, width * 0.22, height * 0.24, 12);
+    ctx.fill();
+    ctx.strokeStyle = dark;
+    ctx.lineWidth = 4;
+    roundedRectPath(ctx, -width * 0.38, -height * 0.02, width * 0.76, height * 0.38, 24);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-width * 0.14, -height * 0.02);
+    ctx.lineTo(-width * 0.14, height * 0.26);
+    ctx.moveTo(width * 0.14, -height * 0.02);
+    ctx.lineTo(width * 0.14, height * 0.26);
+    ctx.stroke();
+    ctx.fillStyle = eyeWhite;
+    ctx.beginPath();
+    ctx.ellipse(-14, 4, 10, 9, 0, 0, Math.PI * 2);
+    ctx.ellipse(14, 4, 10, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = pupil;
+    ctx.beginPath();
+    ctx.arc(-12, 5, 3.2, 0, Math.PI * 2);
+    ctx.arc(16, 5, 3.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = pupil;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(-16, 24);
+    ctx.quadraticCurveTo(0, 30, 16, 24);
+    ctx.stroke();
+    if (!preview) {
+      drawEnemyLegs(
+        [
+          [-28, height * 0.22, -34, height * 0.44],
+          [28, height * 0.22, 34, height * 0.44],
+        ],
+        dark,
+      );
+    }
+    return;
+  }
+
+  if (enemyType === "blob") {
+    ctx.fillStyle = palette.fill;
+    ctx.beginPath();
+    ctx.moveTo(-width * 0.34, height * 0.1);
+    ctx.quadraticCurveTo(-width * 0.44, -height * 0.18, -width * 0.16, -height * 0.38);
+    ctx.quadraticCurveTo(0, -height * 0.5, width * 0.16, -height * 0.34);
+    ctx.quadraticCurveTo(width * 0.44, -height * 0.18, width * 0.34, height * 0.1);
+    ctx.quadraticCurveTo(width * 0.2, height * 0.26, 0, height * 0.2);
+    ctx.quadraticCurveTo(-width * 0.2, height * 0.26, -width * 0.34, height * 0.1);
+    ctx.fill();
+    ctx.strokeStyle = dark;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.22)";
+    ctx.beginPath();
+    ctx.moveTo(0, -20);
+    ctx.lineTo(10, -2);
+    ctx.lineTo(0, 16);
+    ctx.lineTo(-10, -2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.beginPath();
+    ctx.arc(-16, -8, 8, 0, Math.PI * 2);
+    ctx.arc(0, 8, 12, 0, Math.PI * 2);
+    ctx.arc(18, -2, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = eyeWhite;
+    ctx.beginPath();
+    ctx.ellipse(-14, -10, 9, 9, 0, 0, Math.PI * 2);
+    ctx.ellipse(14, -10, 10, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = pupil;
+    ctx.beginPath();
+    ctx.arc(-12, -8, 3.5, 0, Math.PI * 2);
+    ctx.arc(16, -8, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = pupil;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(-12, 14);
+    ctx.quadraticCurveTo(0, 24, 12, 14);
+    ctx.stroke();
+    if (!preview) {
+      drawEnemyLegs(
+        [
+          [-22, height * 0.18, -28, height * 0.34],
+          [-6, height * 0.22, -10, height * 0.42],
+          [6, height * 0.22, 10, height * 0.42],
+          [22, height * 0.18, 28, height * 0.34],
+        ],
+        dark,
+      );
+    }
+    return;
+  }
+
+  if (enemyType === "flyer") {
+    ctx.strokeStyle = dark;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(-14, -8);
+    ctx.quadraticCurveTo(-width * 0.5, -height * 0.22, -width * 0.34, height * 0.1);
+    ctx.moveTo(14, -8);
+    ctx.quadraticCurveTo(width * 0.5, -height * 0.22, width * 0.34, height * 0.1);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.16)";
+    ctx.beginPath();
+    ctx.moveTo(-14, -8);
+    ctx.quadraticCurveTo(-width * 0.34, -height * 0.22, -width * 0.26, height * 0.04);
+    ctx.quadraticCurveTo(-width * 0.08, -0.02 * height, -14, -8);
+    ctx.moveTo(14, -8);
+    ctx.quadraticCurveTo(width * 0.34, -height * 0.22, width * 0.26, height * 0.04);
+    ctx.quadraticCurveTo(width * 0.08, -0.02 * height, 14, -8);
+    ctx.fill();
+    ctx.fillStyle = palette.fill;
+    ctx.beginPath();
+    ctx.ellipse(0, -4, width * 0.14, height * 0.24, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = dark;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, -height * 0.42);
+    ctx.lineTo(0, -height * 0.54);
+    ctx.moveTo(-10, -height * 0.36);
+    ctx.lineTo(0, -height * 0.48);
+    ctx.lineTo(10, -height * 0.36);
+    ctx.stroke();
+    ctx.fillStyle = eyeWhite;
+    ctx.beginPath();
+    ctx.ellipse(-8, -18, 7, 8, 0, 0, Math.PI * 2);
+    ctx.ellipse(8, -18, 7, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = pupil;
+    ctx.beginPath();
+    ctx.arc(-7, -17, 3, 0, Math.PI * 2);
+    ctx.arc(9, -17, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = pupil;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(-8, -2);
+    ctx.quadraticCurveTo(0, 4, 8, -2);
+    ctx.stroke();
+    if (!preview) {
+      drawEnemyLegs(
+        [
+          [-10, height * 0.24, -14, height * 0.42],
+          [10, height * 0.24, 14, height * 0.42],
+        ],
+        dark,
+      );
+    }
+    return;
+  }
+
+  ctx.fillStyle = palette.fill;
+  ctx.beginPath();
+  ctx.arc(0, -4, Math.min(width * 0.24, height * 0.26), 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = dark;
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-10, -24);
+  ctx.lineTo(-18, -34);
+  ctx.moveTo(10, -24);
+  ctx.lineTo(18, -34);
+  ctx.stroke();
+  ctx.fillStyle = "rgba(255,255,255,0.22)";
+  ctx.beginPath();
+  ctx.moveTo(0, -20);
+  ctx.lineTo(8, -8);
+  ctx.lineTo(0, 4);
+  ctx.lineTo(-8, -8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = eyeWhite;
+  ctx.beginPath();
+  ctx.ellipse(-10, -10, 7, 8, 0, 0, Math.PI * 2);
+  ctx.ellipse(10, -10, 7, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = pupil;
+  ctx.beginPath();
+  ctx.arc(-9, -9, 3, 0, Math.PI * 2);
+  ctx.arc(11, -9, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = pupil;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-8, 8);
+  ctx.quadraticCurveTo(0, 16, 8, 8);
+  ctx.stroke();
+  if (!preview) {
+    drawEnemyLegs(
+      [
+        [-10, height * 0.18, -14, height * 0.42],
+        [10, height * 0.18, 14, height * 0.42],
+      ],
+      dark,
+    );
+  }
+}
+
 function drawBlock(x, y, block, options = {}) {
   if (block.entityType === "enemy") {
     drawEnemySprite(x, y, block, options);
@@ -2518,69 +2961,46 @@ function drawBlock(x, y, block, options = {}) {
   ctx.globalAlpha = preview ? 0.45 : 1;
 
   if (!preview) {
-    ctx.fillStyle = active ? "rgba(255,241,179,0.22)" : "rgba(255,255,255,0.08)";
+    ctx.fillStyle = active ? "rgba(255,231,166,0.34)" : "rgba(255,245,214,0.16)";
     ctx.beginPath();
-    ctx.ellipse(0, 6, width * 0.48, height * 0.3, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 12, width * 0.3, height * 0.16, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = active ? "rgba(255,248,214,0.3)" : "rgba(255,248,214,0.18)";
+    ctx.beginPath();
+    ctx.ellipse(0, -6, width * 0.24, height * 0.24, 0, 0, Math.PI * 2);
     ctx.fill();
   }
-
-  ctx.fillStyle = block.hitFlash > 0 ? "#ffffff" : fill;
-  roundedRectPath(ctx, -width / 2, -height / 2, width, height, 18);
-  ctx.fill();
   drawStatusEffects(width, height, block);
 
-  ctx.fillStyle = "rgba(255,255,255,0.2)";
-  roundedRectPath(ctx, -width / 2 + 8, -height / 2 + 8, width - 16, height * 0.32, 12);
-  ctx.fill();
-
-  ctx.fillStyle = "rgba(255,255,255,0.14)";
-  ctx.beginPath();
-  ctx.moveTo(-width / 2 + 14, height / 2 - 14);
-  ctx.lineTo(width / 2 - 14, height / 2 - 14);
-  ctx.lineTo(width / 2 - 28, height / 2 - 2);
-  ctx.lineTo(-width / 2 + 28, height / 2 - 2);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.strokeStyle = "rgba(255,255,255,0.72)";
-  ctx.lineWidth = active ? 5 : 4;
-  roundedRectPath(ctx, -width / 2 + 2, -height / 2 + 2, width - 4, height - 4, 16);
-  ctx.stroke();
-
-  ctx.fillStyle = deep;
-  ctx.beginPath();
-  ctx.arc(-width / 2 + 18, -height / 2 + 18, preview ? 6 : 8, 0, Math.PI * 2);
-  ctx.arc(width / 2 - 18, -height / 2 + 18, preview ? 6 : 8, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = active ? "#fef3c7" : "#ffffff";
+  ctx.fillStyle = active ? "#fff8dd" : "#fffdf6";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = preview ? "900 28px Avenir Next" : "900 36px Avenir Next";
-  ctx.fillText(`${block.hp}`, 0, preview ? 0 : 2);
+  ctx.fillText(`${block.hp}`, 0, preview ? -32 : -38);
+  drawItemStackCharacter(width, height, block, active, preview, { fill, deep });
   drawRewardIconSet(block, preview);
   if (block.perk && block.entityType === "item" && !preview) {
     drawPerkIcon(block.perk);
   }
-
-  ctx.strokeStyle = deep;
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(-width / 2, height / 2);
-  ctx.lineTo(width / 2, height / 2);
-  ctx.stroke();
   ctx.restore();
 }
 
 function drawEnemySprite(x, y, block, options = {}) {
   const { active = false, preview = false } = options;
   const bob = preview ? 0 : Math.sin((state.backgroundDrift + x) * 0.08) * 4;
+  const enemyType = block.enemyType ?? "runner";
   const baseScale = block.isElite ? 1.12 : block.enemyType === "mini" ? 0.78 : 1;
   const scale = preview ? 0.72 : block.hitFlash > 0 ? 0.97 * baseScale : baseScale;
-  const width = BLOCK_WIDTH * scale;
-  const height = BLOCK_HEIGHT * scale;
-  const blink = Math.sin((state.backgroundDrift + x) * 0.18) > 0.92;
-  const enemyType = block.enemyType ?? "runner";
+  const width =
+    enemyType === "tank" ? BLOCK_WIDTH * 1.02 * scale : enemyType === "flyer" ? BLOCK_WIDTH * 0.86 * scale : BLOCK_WIDTH * scale;
+  const height =
+    enemyType === "runner"
+      ? BLOCK_HEIGHT * 1.18 * scale
+      : enemyType === "flyer"
+        ? BLOCK_HEIGHT * 1.28 * scale
+        : enemyType === "mini"
+          ? BLOCK_HEIGHT * 0.82 * scale
+          : BLOCK_HEIGHT * scale;
   const { fill, deep } = getBlockColors(block);
   const rim = active ? "#ffe8a3" : deep;
 
@@ -2588,10 +3008,17 @@ function drawEnemySprite(x, y, block, options = {}) {
   ctx.translate(x, y + bob);
   ctx.globalAlpha = preview ? 0.5 : 1;
 
-  ctx.fillStyle = block.hitFlash > 0 ? "#fff1f2" : fill;
-  roundedRectPath(ctx, -width / 2, -height / 2, width, height, 24);
-  ctx.fill();
+  const cornerRadius =
+    enemyType === "tank" ? 18 : enemyType === "blob" ? 30 : enemyType === "flyer" ? 20 : enemyType === "mini" ? 22 : 24;
+
   drawStatusEffects(width, height, block);
+
+  if (!preview) {
+    ctx.fillStyle = active ? "rgba(76, 36, 42, 0.22)" : "rgba(37, 24, 54, 0.16)";
+    ctx.beginPath();
+    ctx.ellipse(0, height * 0.18, width * 0.28, height * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   if (block.isElite) {
     ctx.strokeStyle = "#fef08a";
@@ -2610,125 +3037,17 @@ function drawEnemySprite(x, y, block, options = {}) {
     ctx.fill();
   }
 
-  ctx.fillStyle = "rgba(255,255,255,0.15)";
-  roundedRectPath(ctx, -width / 2 + 10, -height / 2 + 10, width - 20, 18, 8);
-  ctx.fill();
+  drawEnemyBlockCharacter(width, height, block, enemyType, preview, { fill, deep });
 
-  ctx.strokeStyle = rim;
-  ctx.lineWidth = active ? 5 : 4;
-  ctx.strokeRect(-width / 2 + 2, -height / 2 + 2, width - 4, height - 4);
-
-  if (enemyType === "tank") {
-    ctx.fillStyle = "rgba(255,255,255,0.16)";
-    roundedRectPath(ctx, -width / 2 + 18, -4, width - 36, 22, 10);
-    ctx.fill();
-  } else if (enemyType === "blob") {
-    ctx.fillStyle = "rgba(255,255,255,0.14)";
-    ctx.beginPath();
-    ctx.arc(-18, 10, 12, 0, Math.PI * 2);
-    ctx.arc(0, 16, 16, 0, Math.PI * 2);
-    ctx.arc(18, 10, 12, 0, Math.PI * 2);
-    ctx.fill();
-  } else if (enemyType === "flyer") {
-    ctx.strokeStyle = "rgba(255,255,255,0.28)";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(-34, -8);
-    ctx.quadraticCurveTo(-18, -24, -2, -8);
-    ctx.moveTo(34, -8);
-    ctx.quadraticCurveTo(18, -24, 2, -8);
-    ctx.stroke();
-  } else {
-    ctx.fillStyle = "rgba(255,255,255,0.14)";
-    ctx.beginPath();
-    ctx.moveTo(-18, -20);
-    ctx.lineTo(-8, -34);
-    ctx.lineTo(0, -18);
-    ctx.lineTo(8, -34);
-    ctx.lineTo(18, -20);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  const eyeY = -10;
-  const eyeOffset = 22;
-  ctx.fillStyle = "#fff5f7";
-  if (blink && !preview) {
-    ctx.fillRect(-eyeOffset - 10, eyeY, 20, 3);
-    ctx.fillRect(eyeOffset - 10, eyeY, 20, 3);
-  } else {
-    ctx.beginPath();
-    ctx.ellipse(-eyeOffset, eyeY, 10, 12, 0, 0, Math.PI * 2);
-    ctx.ellipse(eyeOffset, eyeY, 10, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = "#14213d";
-    const pupilShift = active ? 2.5 : Math.sin((state.backgroundDrift + x) * 0.06) * 2;
-    ctx.beginPath();
-    ctx.arc(-eyeOffset + pupilShift, eyeY + 1, 4, 0, Math.PI * 2);
-    ctx.arc(eyeOffset + pupilShift, eyeY + 1, 4, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  ctx.strokeStyle = deep;
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  ctx.moveTo(-24, 16);
-  ctx.quadraticCurveTo(0, 30 + Math.sin(state.backgroundDrift * 0.08) * 4, 24, 16);
-  ctx.stroke();
-
-  ctx.fillStyle = "#fff5f7";
-  ctx.beginPath();
-  ctx.moveTo(-20, 18);
-  ctx.lineTo(-12, 34);
-  ctx.lineTo(-4, 18);
-  ctx.moveTo(4, 18);
-  ctx.lineTo(12, 34);
-  ctx.lineTo(20, 18);
-  ctx.fill();
-
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#fff5f0";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = preview ? "900 28px Avenir Next" : "900 34px Avenir Next";
-  ctx.fillText(`${block.hp}`, 0, -34);
+  ctx.fillText(`${block.hp}`, 0, -42);
   if (!preview) {
     ctx.font = "800 12px Avenir Next";
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
-    ctx.fillText(block.isElite ? `精英${block.enemyStats?.name ?? ENEMY_NAME}` : block.enemyStats?.name ?? ENEMY_NAME, 0, 34);
-  }
-
-  if (!preview) {
-    const legSwing = Math.sin((state.backgroundDrift + x) * 0.12) * 5;
-    if (enemyType === "flyer") {
-      ctx.strokeStyle = deep;
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.moveTo(-16, height / 2 - 6);
-      ctx.lineTo(-10, height / 2 + 10);
-      ctx.moveTo(16, height / 2 - 6);
-      ctx.lineTo(10, height / 2 + 10);
-      ctx.stroke();
-    } else if (enemyType === "blob") {
-      ctx.fillStyle = "rgba(20,33,61,0.26)";
-      ctx.beginPath();
-      ctx.arc(-14, height / 2 - 2, 6, 0, Math.PI * 2);
-      ctx.arc(14, height / 2 - 2, 6, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.strokeStyle = deep;
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(-24, height / 2 - 10);
-      ctx.lineTo(-30 - legSwing, height / 2 + 18);
-      ctx.moveTo(-6, height / 2 - 10);
-      ctx.lineTo(-2 + legSwing, height / 2 + 16);
-      ctx.moveTo(6, height / 2 - 10);
-      ctx.lineTo(2 - legSwing, height / 2 + 16);
-      ctx.moveTo(24, height / 2 - 10);
-      ctx.lineTo(30 + legSwing, height / 2 + 18);
-      ctx.stroke();
-    }
+    ctx.fillStyle = "rgba(255,240,232,0.92)";
+    ctx.fillText(block.isElite ? `精英${block.enemyStats?.name ?? ENEMY_NAME}` : block.enemyStats?.name ?? ENEMY_NAME, 0, 38);
   }
 
   ctx.restore();
@@ -2790,11 +3109,94 @@ function drawBoss() {
   ctx.beginPath();
   ctx.ellipse(0, 0, 118, 92, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = state.boss.hitFlash > 0 ? "#fef3c7" : state.boss.bodyColor;
-  roundedRectPath(ctx, -96, -74, 192, 148, 30);
-  ctx.fill();
+  const body = state.boss.hitFlash > 0 ? "#fef3c7" : state.boss.bodyColor;
+  ctx.fillStyle = body;
+  ctx.strokeStyle = "#1f1b3d";
+  ctx.lineWidth = 6;
+
+  if (state.boss.abilityType === "charge") {
+    roundedRectPath(ctx, -86, -58, 172, 128, 34);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-42, -58);
+    ctx.lineTo(-58, -86);
+    ctx.moveTo(42, -58);
+    ctx.lineTo(58, -86);
+    ctx.stroke();
+  } else if (state.boss.abilityType === "shield") {
+    ctx.beginPath();
+    ctx.moveTo(-62, 62);
+    ctx.quadraticCurveTo(-92, -10, -24, -56);
+    ctx.quadraticCurveTo(52, -92, 86, -30);
+    ctx.quadraticCurveTo(106, 14, 72, 58);
+    ctx.quadraticCurveTo(36, 80, -62, 62);
+    ctx.fill();
+    ctx.stroke();
+  } else if (state.boss.abilityType === "armor") {
+    roundedRectPath(ctx, -92, -50, 184, 116, 28);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = state.boss.accentColor;
+    ctx.beginPath();
+    ctx.moveTo(-66, -50);
+    ctx.lineTo(-42, -82);
+    ctx.lineTo(42, -82);
+    ctx.lineTo(66, -50);
+    ctx.closePath();
+    ctx.fill();
+  } else if (state.boss.abilityType === "sway") {
+    ctx.beginPath();
+    ctx.moveTo(0, -86);
+    ctx.lineTo(58, -44);
+    ctx.lineTo(58, 20);
+    ctx.quadraticCurveTo(58, 68, 0, 88);
+    ctx.quadraticCurveTo(-58, 68, -58, 20);
+    ctx.lineTo(-58, -44);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = state.boss.accentColor;
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.moveTo(-94, -8);
+    ctx.lineTo(-36, 20);
+    ctx.moveTo(94, -8);
+    ctx.lineTo(36, 20);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(-86, 40);
+    ctx.quadraticCurveTo(-92, -56, -8, -84);
+    ctx.quadraticCurveTo(52, -110, 92, -46);
+    ctx.quadraticCurveTo(112, 0, 86, 46);
+    ctx.quadraticCurveTo(48, 88, -16, 82);
+    ctx.quadraticCurveTo(-76, 78, -86, 40);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(22, -44);
+    ctx.lineTo(62, -88);
+    ctx.moveTo(36, -20);
+    ctx.lineTo(76, -30);
+    ctx.stroke();
+  }
+
   ctx.fillStyle = state.boss.accentColor;
-  roundedRectPath(ctx, -72, -60, 144, 24, 12);
+  ctx.beginPath();
+  if (state.boss.abilityType === "shield") {
+    ctx.arc(38, -44, 18, 0, Math.PI * 2);
+  } else if (state.boss.abilityType === "sway") {
+    ctx.moveTo(0, -62);
+    ctx.lineTo(16, -38);
+    ctx.lineTo(0, -18);
+    ctx.lineTo(-16, -38);
+    ctx.closePath();
+  } else if (state.boss.abilityType === "hybrid") {
+    ctx.arc(-10, -14, 14, 0, Math.PI * 2);
+  } else {
+    roundedRectPath(ctx, -44, -50, 88, 20, 10);
+  }
   ctx.fill();
   drawStatusEffects(192, 148, state.boss);
 
@@ -2806,29 +3208,46 @@ function drawBoss() {
     ctx.stroke();
   }
 
+  ctx.fillStyle = "#fff7f4";
+  ctx.beginPath();
+  ctx.ellipse(-24, -12, 12, 14, 0, 0, Math.PI * 2);
+  ctx.ellipse(24, -14, 12, 14, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#241d43";
+  ctx.beginPath();
+  ctx.arc(-21, -10, 5, 0, Math.PI * 2);
+  ctx.arc(27, -12, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#241d43";
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(-24, 18);
+  ctx.quadraticCurveTo(0, 4, 24, 18);
+  ctx.stroke();
+
   ctx.fillStyle = "#0f172a";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = "900 14px Avenir Next";
-  ctx.fillText(state.boss.name, 0, -48);
+  ctx.fillText(state.boss.name, 0, -100);
 
   ctx.fillStyle = "#f8fafc";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = "900 38px Avenir Next";
-  ctx.fillText(`${state.boss.hp}`, 0, 4);
+  ctx.font = "900 34px Avenir Next";
+  ctx.fillText(`${state.boss.hp}`, 0, 56);
   drawRewardIconSet({ reward: state.boss.reward }, false);
 
   ctx.fillStyle = "rgba(255,255,255,0.18)";
-  ctx.fillRect(-76, -50, 152, 14);
+  ctx.fillRect(-76, 72, 152, 14);
   ctx.fillStyle = "#80ed99";
-  ctx.fillRect(-76, -50, 152 * (state.boss.hp / state.boss.maxHp), 14);
+  ctx.fillRect(-76, 72, 152 * (state.boss.hp / state.boss.maxHp), 14);
 
   if (state.boss.shieldMaxHp > 0) {
     ctx.fillStyle = "rgba(191,219,254,0.18)";
-    ctx.fillRect(-76, -68, 152, 10);
+    ctx.fillRect(-76, 58, 152, 10);
     ctx.fillStyle = "#93c5fd";
-    ctx.fillRect(-76, -68, 152 * (state.boss.shieldHp / state.boss.shieldMaxHp), 10);
+    ctx.fillRect(-76, 58, 152 * (state.boss.shieldHp / state.boss.shieldMaxHp), 10);
   }
   ctx.restore();
 }
@@ -2878,46 +3297,83 @@ function drawPlayer() {
     ctx.fill();
   }
 
-  ctx.fillStyle = "#0f172a";
-  roundedRectPath(ctx, -34, -34, 68, 72, 24);
-  ctx.fill();
-
-  ctx.fillStyle = "#ffcf70";
-  roundedRectPath(ctx, -22, -28, 44, 30, 14);
-  ctx.fill();
-
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#6a82bf";
   ctx.beginPath();
-  ctx.arc(-8, -14, 4, 0, Math.PI * 2);
-  ctx.arc(8, -14, 4, 0, Math.PI * 2);
+  ctx.moveTo(-26, -10);
+  ctx.quadraticCurveTo(-40, -42, -14, -58);
+  ctx.quadraticCurveTo(0, -68, 14, -58);
+  ctx.quadraticCurveTo(40, -42, 26, -10);
+  ctx.quadraticCurveTo(24, 26, 0, 34);
+  ctx.quadraticCurveTo(-24, 26, -26, -10);
   ctx.fill();
-
-  ctx.fillStyle = "#14213d";
-  ctx.beginPath();
-  ctx.arc(-7, -13, 2, 0, Math.PI * 2);
-  ctx.arc(9, -13, 2, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = "#14213d";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(-8, -4);
-  ctx.quadraticCurveTo(0, 2, 8, -4);
+  ctx.strokeStyle = "#4b639b";
+  ctx.lineWidth = 4;
   ctx.stroke();
 
-  ctx.fillStyle = "#3fb68b";
-  roundedRectPath(ctx, -40, 18, 80, 24, 12);
-  ctx.fill();
-
-  ctx.fillStyle = "#1f2937";
-  roundedRectPath(ctx, -24, 26, 48, 10, 5);
-  ctx.fill();
-
-  ctx.fillStyle = "#5eead4";
+  ctx.fillStyle = "rgba(255,255,255,0.22)";
   ctx.beginPath();
-  ctx.arc(-18, 30, 6, 0, Math.PI * 2);
-  ctx.arc(18, 30, 6, 0, Math.PI * 2);
+  ctx.arc(0, -18, 22, 0, Math.PI * 2);
   ctx.fill();
+
+  ctx.fillStyle = "#ffe08b";
+  roundedRectPath(ctx, -12, -60, 24, 28, 12);
+  ctx.fill();
+  ctx.strokeStyle = "#c6964b";
+  ctx.stroke();
+
+  ctx.strokeStyle = "#6a82bf";
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(-16, -36);
+  ctx.lineTo(-28, -54);
+  ctx.moveTo(16, -36);
+  ctx.lineTo(28, -54);
+  ctx.stroke();
+
+  ctx.fillStyle = "#ffd47b";
+  ctx.beginPath();
+  ctx.arc(-30, -2, 10, 0, Math.PI * 2);
+  ctx.arc(30, -2, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#c6964b";
+  ctx.stroke();
+
+  ctx.fillStyle = "#fffaf3";
+  ctx.beginPath();
+  ctx.arc(-10, -16, 9, 0, Math.PI * 2);
+  ctx.arc(10, -16, 9, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#294469";
+  ctx.beginPath();
+  ctx.arc(-8, -14, 3.4, 0, Math.PI * 2);
+  ctx.arc(12, -14, 3.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#294469";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-10, 0);
+  ctx.quadraticCurveTo(0, 8, 10, 0);
+  ctx.stroke();
+
+  ctx.fillStyle = "#ffd47b";
+  ctx.beginPath();
+  ctx.arc(0, -38, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#c6964b";
+  ctx.stroke();
+
+  ctx.fillStyle = "#23304d";
+  roundedRectPath(ctx, -22, 28, 44, 10, 5);
+  ctx.fill();
+
+  ctx.strokeStyle = "#6a82bf";
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(-16, 28);
+  ctx.lineTo(-22, 44);
+  ctx.moveTo(16, 28);
+  ctx.lineTo(22, 44);
+  ctx.stroke();
 
   drawWeaponRig();
 
@@ -3353,7 +3809,7 @@ function registerOfflineSupport() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register(`./sw.js?v=${OFFLINE_CACHE_VERSION}`)
+      .register(`./sw.js?v=${OFFLINE_CACHE_VERSION}`, { updateViaCache: "none" })
       .then((registration) => {
         if (registration.waiting) {
           waitingServiceWorker = registration.waiting;
@@ -3496,6 +3952,20 @@ window.__gameDebug = {
   setUltimateChargeForTest(value) {
     state.ultimateCharge = Math.max(0, Math.min(ULTIMATE_MAX, value));
     updateHud();
+  },
+  sampleRowsForTest(count, startIndex = 0) {
+    return Array.from({ length: count }, (_, offset) => {
+      const row = createRow(startIndex + offset);
+      return {
+        index: startIndex + offset,
+        blocks: row.blocks.map((block) => ({
+          lane: block.lane,
+          entityType: block.entityType,
+          rewardType: block.rewardType,
+          rewardValue: block.rewardValue,
+        })),
+      };
+    });
   },
 };
 

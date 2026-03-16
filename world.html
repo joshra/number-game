@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Number Gate Rush 角色聖經</title>
+    <link rel="stylesheet" href="./world.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero__copy">
+          <p class="eyebrow">Character Bible</p>
+          <h1>把整個宇宙重做成值得得獎的角色作品</h1>
+          <p class="hero__lead">
+            這一版完全推翻「可愛方塊怪」思路，改成一個帶童話殘酷感、玩具工藝感與高辨識剪影的世界。
+            角色不再是數值容器，而是帶命運、階級、信仰與身體語言的存在。
+          </p>
+          <div class="hero__quote">
+            <strong>美術總綱</strong>
+            <p>像吉卜力的慈悲、TGA 獲獎獨立遊戲的銳度、精品玩具的材質，合成一個孩子會愛、大人會記住的宇宙。</p>
+          </div>
+          <div class="hero__actions">
+            <a class="button button--primary" href="./index.html">回遊戲</a>
+            <a class="button button--ghost" href="#cast">看主角群</a>
+          </div>
+        </div>
+        <div class="hero__art" aria-hidden="true">
+          <svg class="hero-poster" viewBox="0 0 720 720" role="presentation">
+            <defs>
+              <linearGradient id="bg-rift" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stop-color="#f3e6c3" />
+                <stop offset="38%" stop-color="#f4b38a" />
+                <stop offset="100%" stop-color="#5d4fa2" />
+              </linearGradient>
+              <radialGradient id="moon-core" cx="50%" cy="45%" r="55%">
+                <stop offset="0%" stop-color="#fff7d7" />
+                <stop offset="100%" stop-color="#ffd572" />
+              </radialGradient>
+              <linearGradient id="hero-armor" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stop-color="#fff7eb" />
+                <stop offset="100%" stop-color="#8ba0d8" />
+              </linearGradient>
+              <linearGradient id="villain-skin" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stop-color="#ff8f83" />
+                <stop offset="100%" stop-color="#6d55c4" />
+              </linearGradient>
+            </defs>
+            <rect x="18" y="18" width="684" height="684" rx="54" fill="url(#bg-rift)" />
+            <circle cx="532" cy="170" r="92" fill="url(#moon-core)" opacity="0.92" />
+            <path d="M130 640c34-144 154-244 286-244 73 0 144 28 215 92-26 67-72 132-123 180H130z" fill="#1a2240" opacity="0.28" />
+            <path d="M301 260c-58 18-105 79-105 148 0 72 53 131 127 145 79 16 163-14 204-77 48-72 23-174-57-220-47-28-117-26-169 4z" fill="url(#villain-skin)" opacity="0.92" />
+            <circle cx="360" cy="318" r="37" fill="#fff7f4" />
+            <circle cx="435" cy="308" r="41" fill="#fff7f4" />
+            <circle cx="368" cy="325" r="15" fill="#39275a" />
+            <circle cx="443" cy="315" r="17" fill="#39275a" />
+            <path d="M333 401c36-24 92-33 143-7" fill="none" stroke="#39275a" stroke-linecap="round" stroke-width="16" />
+            <path d="M295 220l-47-37M487 214l49-55" fill="none" stroke="#39275a" stroke-linecap="round" stroke-width="18" />
+            <path d="M234 586c12-163 117-279 237-279 115 0 188 120 175 231-8 63-49 109-110 136-97 43-214 20-263-88z" fill="#2a2348" opacity="0.32" />
+            <g transform="translate(78 316)">
+              <ellipse cx="112" cy="244" rx="95" ry="22" fill="rgba(37,56,104,0.14)" />
+              <path d="M60 207c0-69 39-138 103-151 34-7 69 0 97 24 22 19 36 46 36 78 0 83-72 146-148 146-49 0-88-11-88-97z" fill="url(#hero-armor)" />
+              <rect x="99" y="44" width="54" height="52" rx="24" fill="#ffe28d" stroke="#d7a85a" stroke-width="10" />
+              <circle cx="131" cy="135" r="24" fill="#fffaf1" />
+              <circle cx="192" cy="131" r="26" fill="#fffaf1" />
+              <circle cx="138" cy="141" r="9" fill="#28456e" />
+              <circle cx="199" cy="137" r="10" fill="#28456e" />
+              <path d="M132 187c18 18 58 18 76 0" fill="none" stroke="#28456e" stroke-linecap="round" stroke-width="10" />
+              <path d="M101 96L72 56M203 96l30-40" fill="none" stroke="#6a82bf" stroke-linecap="round" stroke-width="12" />
+              <circle cx="87" cy="168" r="20" fill="#ffd279" stroke="#d49c45" stroke-width="8" />
+              <circle cx="239" cy="170" r="20" fill="#ffd279" stroke="#d49c45" stroke-width="8" />
+              <path d="M143 304l-26 30M194 304l26 30" fill="none" stroke="#6a82bf" stroke-linecap="round" stroke-width="12" />
+            </g>
+            <g transform="translate(500 466)">
+              <ellipse cx="42" cy="95" rx="48" ry="14" fill="rgba(255,243,192,0.18)" />
+              <path d="M42 4l26 45-26 45-26-45z" fill="#7ad3ff" stroke="#3a88b7" stroke-width="10" />
+              <circle cx="31" cy="45" r="8" fill="#fffef8" />
+              <circle cx="53" cy="45" r="8" fill="#fffef8" />
+              <path d="M31 60c7 5 15 5 22 0" fill="none" stroke="#35516b" stroke-linecap="round" stroke-width="5" />
+              <path d="M16 8L6-7M69 8l10-15M42 -6V-28" fill="none" stroke="#f6d171" stroke-linecap="round" stroke-width="8" />
+            </g>
+          </svg>
+          <div class="hero__caption">
+            <strong>新的視覺重心</strong>
+            <p>主角不是砲台，反派不是怪物，核心不是道具。三者都必須像主角級角色一樣成立。</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="manifesto panel">
+          <div class="section-heading">
+            <p class="eyebrow">Manifesto</p>
+            <h2>新的宇宙規則</h2>
+          </div>
+          <div class="manifesto__grid">
+            <article class="manifesto-card">
+              <h3>數字是宗教，不是介面</h3>
+              <p>這個世界的人相信數字是維持四季、潮汐和記憶的神聖節律。敵人掠奪數字核心，不是偷寶石，而是偷走世界的秩序。</p>
+            </article>
+            <article class="manifesto-card">
+              <h3>敵人是墮落的工藝品</h3>
+              <p>所有敵人都來自被裂界污染的玩具、木偶、祭器與舞台道具，所以造型會帶工藝痕跡，而不是廉價魔物感。</p>
+            </article>
+            <article class="manifesto-card">
+              <h3>角色要先靠剪影成立</h3>
+              <p>就算把顏色拿掉、縮成黑影，玩家也應該能一眼分出誰是英雄、誰是王、誰是偷襲型小怪。這是整頁所有設計的底線。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel section section--gallery">
+          <div class="section-heading">
+            <p class="eyebrow">Visual Board</p>
+            <h2>整組角色必須站在一起也成立</h2>
+          </div>
+          <div class="gallery-board">
+            <div class="gallery-board__poster" aria-hidden="true">
+              <svg viewBox="0 0 1080 420" role="presentation">
+                <defs>
+                  <linearGradient id="board-sky" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#f5ead3" />
+                    <stop offset="100%" stop-color="#cfd8ef" />
+                  </linearGradient>
+                  <linearGradient id="board-villain" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#ff9d88" />
+                    <stop offset="100%" stop-color="#6c56c2" />
+                  </linearGradient>
+                </defs>
+                <rect x="10" y="10" width="1060" height="400" rx="40" fill="url(#board-sky)" />
+                <circle cx="845" cy="96" r="52" fill="#ffe08f" opacity="0.92" />
+                <ellipse cx="540" cy="346" rx="376" ry="38" fill="rgba(38,51,82,0.1)" />
+                <g transform="translate(166 116)">
+                  <path d="M22 152c0-72 38-124 96-136 65-12 109 34 109 100 0 72-58 122-130 122-38 0-75-9-75-86z" fill="#fff5e8" stroke="#5d75b8" stroke-width="9" />
+                  <circle cx="80" cy="98" r="22" fill="#fffaf2" />
+                  <circle cx="136" cy="94" r="24" fill="#fffaf2" />
+                  <circle cx="87" cy="103" r="8" fill="#2b4469" />
+                  <circle cx="143" cy="99" r="9" fill="#2b4469" />
+                  <path d="M78 142c14 14 54 14 68 0" fill="none" stroke="#2b4469" stroke-linecap="round" stroke-width="10" />
+                  <rect x="86" y="8" width="35" height="32" rx="14" fill="#ffd982" stroke="#d3a154" stroke-width="7" />
+                </g>
+                <g transform="translate(445 130)">
+                  <path d="M70 0l46 68-46 68-46-68z" fill="#84dcff" stroke="#3a85b0" stroke-width="9" />
+                  <circle cx="52" cy="71" r="13" fill="#fffdf6" />
+                  <circle cx="88" cy="71" r="13" fill="#fffdf6" />
+                  <path d="M52 98c11 8 25 8 36 0" fill="none" stroke="#476073" stroke-linecap="round" stroke-width="6" />
+                </g>
+                <g transform="translate(640 90)">
+                  <path d="M42 196c-7-61 0-128 54-148 66-24 123 26 111 92-8 40-38 66-100 66-32 0-51-10-65-10z" fill="url(#board-villain)" stroke="#4b3672" stroke-width="9" />
+                  <circle cx="82" cy="111" r="20" fill="#fff7f4" />
+                  <circle cx="138" cy="103" r="23" fill="#fff7f4" />
+                  <path d="M72 154c17-13 51-18 78-2" fill="none" stroke="#36244f" stroke-linecap="round" stroke-width="10" />
+                </g>
+                <g transform="translate(116 278)">
+                  <circle cx="24" cy="24" r="22" fill="#f3a057" stroke="#bf5e2e" stroke-width="5" />
+                  <rect x="84" y="4" width="44" height="40" rx="15" fill="#817ad8" stroke="#48488e" stroke-width="5" />
+                  <path d="M176 42c0-20 15-40 40-40 28 0 43 18 43 38 0 19-14 32-43 32-26 0-40-9-40-30z" fill="#69d2a3" stroke="#2a815f" stroke-width="5" />
+                  <circle cx="338" cy="28" r="21" fill="#79d0ef" stroke="#2a799d" stroke-width="5" />
+                  <circle cx="418" cy="28" r="21" fill="#f5877d" stroke="#ae433f" stroke-width="5" />
+                </g>
+                <g transform="translate(774 254)">
+                  <circle cx="24" cy="24" r="20" fill="#90a968" stroke="#4d6b34" stroke-width="5" />
+                  <path d="M102 47c0-23 11-43 24-43 18 0 26 12 26 25 0 16-10 27-28 27-12 0-22-4-22-9z" fill="#59aacd" stroke="#1f5b74" stroke-width="5" />
+                  <rect x="198" y="8" width="48" height="36" rx="12" fill="#ca6d45" stroke="#742b18" stroke-width="5" />
+                  <path d="M310 4l24 14v28c0 18-11 33-24 40-13-7-24-22-24-40V18z" fill="#7b88ef" stroke="#32418d" stroke-width="5" />
+                  <path d="M390 46c0-24 16-42 37-42 13-8 29-5 38 7 9 11 10 28-1 41-10 11-27 17-48 17-16 0-26-9-26-23z" fill="#5951a6" stroke="#231f56" stroke-width="5" />
+                </g>
+              </svg>
+            </div>
+            <div class="gallery-board__notes">
+              <article class="gallery-note">
+                <h3>英雄組必須溫暖</h3>
+                <p>里拉與紐姆站在一起時，畫面應該先讓人想保護，再讓人想操作。溫暖感必須先於功能感。</p>
+              </article>
+              <article class="gallery-note">
+                <h3>反派組必須有誘惑性</h3>
+                <p>莫拉一族不能醜，只能危險。視覺上要像你知道不該靠近，卻還是會想多看一眼的東西。</p>
+              </article>
+              <article class="gallery-note">
+                <h3>群像組必須有節拍</h3>
+                <p>五種敵系與五位王一起出現時，輪廓節奏應該像一首歌，而不是十個不相關的角色圖拼盤。</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="cast" class="panel section section--spotlight">
+          <div class="section-heading">
+            <p class="eyebrow">Main Cast</p>
+            <h2>三位主角級角色</h2>
+          </div>
+          <div class="spotlight-grid">
+            <article class="spotlight-card spotlight-card--hero">
+              <div class="spotlight-art" aria-hidden="true">
+                <svg viewBox="0 0 340 300" role="presentation">
+                  <defs>
+                    <linearGradient id="lyra-armor" x1="0" x2="1" y1="0" y2="1">
+                      <stop offset="0%" stop-color="#fff8ee" />
+                      <stop offset="100%" stop-color="#90a7e3" />
+                    </linearGradient>
+                  </defs>
+                  <ellipse cx="170" cy="256" rx="98" ry="22" fill="rgba(71,92,149,0.14)" />
+                  <path d="M91 210c0-86 45-148 118-161 79-14 133 42 133 122 0 86-71 144-158 144-47 0-93-10-93-105z" fill="url(#lyra-armor)" stroke="#566fb1" stroke-width="10" />
+                  <rect x="149" y="38" width="42" height="40" rx="18" fill="#ffdf8a" stroke="#d6a451" stroke-width="8" />
+                  <circle cx="146" cy="137" r="28" fill="#fffaf3" />
+                  <circle cx="214" cy="132" r="31" fill="#fffaf3" />
+                  <circle cx="154" cy="143" r="10" fill="#294469" />
+                  <circle cx="222" cy="138" r="11" fill="#294469" />
+                  <path d="M146 191c18 18 66 18 84 0" fill="none" stroke="#294469" stroke-linecap="round" stroke-width="12" />
+                  <path d="M112 104L78 58M229 104l34-48" fill="none" stroke="#6b83c5" stroke-linecap="round" stroke-width="12" />
+                  <circle cx="95" cy="176" r="22" fill="#ffd47c" stroke="#d49d4c" stroke-width="8" />
+                  <circle cx="258" cy="180" r="22" fill="#ffd47c" stroke="#d49d4c" stroke-width="8" />
+                  <path d="M166 298l-24-27M214 298l24-27" fill="none" stroke="#6b83c5" stroke-linecap="round" stroke-width="12" />
+                </svg>
+              </div>
+              <div class="spotlight-copy">
+                <p class="tag">Playable Hero</p>
+                <h3>里拉．星弧守生</h3>
+                <p class="subtitle">會奔跑的守門塔幼生體</p>
+                <div class="chip-row">
+                  <span>祭器生命</span>
+                  <span>祈禱砲環</span>
+                  <span>幼生英雄</span>
+                </div>
+                <p>這不是一座塔，而是一個「還沒長成塔」的生命。里拉的身體像祭器、巡路鐘與守護獸混種，站著像孩子，開火時像祈禱機械。</p>
+                <p>角色魅力來自矛盾：它很小，但背負一個國家的節律；它很可愛，但每次開砲都像在念一段古老誓詞。</p>
+                <ul class="trait-list">
+                  <li>剪影關鍵：高額冠、圓肩炮環、短腿衝刺姿。</li>
+                  <li>材質關鍵：瓷釉、鍍金、舊木心核。</li>
+                  <li>情緒關鍵：勇敢到近乎莽撞。</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="spotlight-card spotlight-card--core">
+              <div class="spotlight-art" aria-hidden="true">
+                <svg viewBox="0 0 340 300" role="presentation">
+                  <defs>
+                    <linearGradient id="nume-core" x1="0" x2="1" y1="0" y2="1">
+                      <stop offset="0%" stop-color="#fff6d6" />
+                      <stop offset="100%" stop-color="#f0a17d" />
+                    </linearGradient>
+                  </defs>
+                  <ellipse cx="170" cy="248" rx="92" ry="20" fill="rgba(213,138,112,0.14)" />
+                  <path d="M170 40l58 84-58 84-58-84z" fill="#8de0ff" stroke="#3b89af" stroke-width="10" />
+                  <rect x="108" y="88" width="124" height="124" rx="34" fill="url(#nume-core)" opacity="0.78" />
+                  <circle cx="146" cy="128" r="18" fill="#fffdf6" />
+                  <circle cx="194" cy="128" r="18" fill="#fffdf6" />
+                  <circle cx="152" cy="134" r="6" fill="#4c5e73" />
+                  <circle cx="200" cy="134" r="6" fill="#4c5e73" />
+                  <path d="M146 166c14 10 34 10 48 0" fill="none" stroke="#4c5e73" stroke-linecap="round" stroke-width="8" />
+                  <path d="M116 82L88 50M224 82l28-32M170 62V24" fill="none" stroke="#f0ca6d" stroke-linecap="round" stroke-width="10" />
+                  <circle cx="170" cy="124" r="68" fill="rgba(255,248,228,0.18)" />
+                </svg>
+              </div>
+              <div class="spotlight-copy">
+                <p class="tag">Living Treasure</p>
+                <h3>紐姆．第一序數精靈</h3>
+                <p class="subtitle">能把世界重新排回正確節拍的孩子</p>
+                <div class="chip-row">
+                  <span>神性幼體</span>
+                  <span>液態光</span>
+                  <span>被拯救者</span>
+                </div>
+                <p>核心不再是通用道具，而是一群「序數精靈」。紐姆是最年幼的一位，外表像玻璃與蜜蠟構成的小孩，會在恐懼時把自己的臉藏進符號光裡。</p>
+                <p>玩家每次回收的不是資源，而是在把一個會哭、會害怕、會唱歌的生命帶回家。</p>
+                <ul class="trait-list">
+                  <li>剪影關鍵：菱形身體、冠狀光角、懸浮姿。</li>
+                  <li>材質關鍵：蜂蠟玻璃、液態光、符文裂紋。</li>
+                  <li>情緒關鍵：脆弱但有神性。</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="spotlight-card spotlight-card--villain">
+              <div class="spotlight-art" aria-hidden="true">
+                <svg viewBox="0 0 340 300" role="presentation">
+                  <defs>
+                    <linearGradient id="moura-skin" x1="0" x2="1" y1="0" y2="1">
+                      <stop offset="0%" stop-color="#ff9489" />
+                      <stop offset="100%" stop-color="#5c49bb" />
+                    </linearGradient>
+                  </defs>
+                  <ellipse cx="170" cy="250" rx="100" ry="24" fill="rgba(100,73,177,0.16)" />
+                  <path d="M102 238c-10-79 0-166 70-192 85-31 157 34 141 121-10 53-48 86-128 86-41 0-66-14-83-15z" fill="url(#moura-skin)" stroke="#49346f" stroke-width="10" />
+                  <circle cx="154" cy="132" r="24" fill="#fff7f4" />
+                  <circle cx="227" cy="122" r="28" fill="#fff7f4" />
+                  <circle cx="161" cy="139" r="9" fill="#36244c" />
+                  <circle cx="234" cy="129" r="10" fill="#36244c" />
+                  <path d="M142 194c24-18 66-24 101-2" fill="none" stroke="#36244c" stroke-linecap="round" stroke-width="12" />
+                  <path d="M120 86L76 50M252 80l52-56" fill="none" stroke="#36244c" stroke-linecap="round" stroke-width="14" />
+                  <path d="M120 246l-25 30M179 258l-12 34M235 252l26 29" fill="none" stroke="#36244c" stroke-linecap="round" stroke-width="12" />
+                </svg>
+              </div>
+              <div class="spotlight-copy">
+                <p class="tag">Antagonist Species</p>
+                <h3>莫拉．裂界藏燈后裔</h3>
+                <p class="subtitle">把「可愛」扭成危險誘惑的竊光者</p>
+                <div class="chip-row">
+                  <span>流放工匠</span>
+                  <span>糖釉裂彩</span>
+                  <span>危險美感</span>
+                </div>
+                <p>反派不該是 generic monster。莫拉這一族原本是替王國保管燈火的幕後工匠，後來被數字神權放逐，於是學會偷走光，讓世界看不清自己。</p>
+                <p>牠們的魅力在於像童話裡你不該靠近的美麗東西：柔軟、明亮、優雅，卻有一種會把你引進裂縫的危險。</p>
+                <ul class="trait-list">
+                  <li>剪影關鍵：歪斜頭冠、空洞大眼、三點式步足。</li>
+                  <li>材質關鍵：裂彩糖釉、磨損布偶、夜色漆。</li>
+                  <li>情緒關鍵：慵懶、殘酷、像在玩。</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel section">
+          <div class="section-heading">
+            <p class="eyebrow">Enemy Choir</p>
+            <h2>五種敵系不是怪，是「裂界歌班」</h2>
+          </div>
+          <div class="enemy-grid">
+            <article class="enemy-card enemy-card--runner">
+              <div class="enemy-card__art" aria-hidden="true">
+                <svg viewBox="0 0 180 180" role="presentation">
+                  <path d="M40 124c0-44 24-81 72-81 28 0 46 18 46 43 0 41-28 61-73 61-18 0-31-5-45-23z" fill="#f7a45c" stroke="#bf5f2b" stroke-width="6" />
+                  <circle cx="87" cy="87" r="11" fill="#fff7ee" />
+                  <circle cx="118" cy="80" r="12" fill="#fff7ee" />
+                  <circle cx="89" cy="89" r="5" fill="#5a382b" />
+                  <circle cx="120" cy="82" r="5" fill="#5a382b" />
+                  <path d="M72 111c10-8 30-13 44-5" fill="none" stroke="#5a382b" stroke-linecap="round" stroke-width="6" />
+                  <path d="M57 132l-14 18M122 137l20 13" fill="none" stroke="#5a382b" stroke-linecap="round" stroke-width="8" />
+                </svg>
+              </div>
+              <h3>跳針犬</h3>
+              <p class="enemy-role">Rush unit</p>
+              <p>像發條獵犬與木偶靴子合體。整個上身都往前傾，視覺上永遠處於快要撲出的瞬間。</p>
+            </article>
+            <article class="enemy-card enemy-card--tank">
+              <div class="enemy-card__art" aria-hidden="true">
+                <svg viewBox="0 0 180 180" role="presentation">
+                  <rect x="40" y="60" width="100" height="70" rx="24" fill="#7d79d4" stroke="#474793" stroke-width="6" />
+                  <rect x="55" y="43" width="34" height="26" rx="12" fill="#ada9ee" stroke="#474793" stroke-width="6" />
+                  <rect x="93" y="40" width="34" height="26" rx="12" fill="#ada9ee" stroke="#474793" stroke-width="6" />
+                  <circle cx="78" cy="92" r="9" fill="#fffaf2" />
+                  <circle cx="104" cy="92" r="9" fill="#fffaf2" />
+                  <path d="M73 112c8 6 31 6 39 0" fill="none" stroke="#35346a" stroke-linecap="round" stroke-width="6" />
+                </svg>
+              </div>
+              <h3>積城龜</h3>
+              <p class="enemy-role">Tank unit</p>
+              <p>像小城堡背在身上的儀式龜，護甲不是貼圖，而是一層層可讀的重量結構。</p>
+            </article>
+            <article class="enemy-card enemy-card--blob">
+              <div class="enemy-card__art" aria-hidden="true">
+                <svg viewBox="0 0 180 180" role="presentation">
+                  <path d="M35 120c0-32 23-63 61-63 18 0 31 8 39 21 7-4 15-5 24-2 13 4 21 18 21 35 0 29-22 47-63 47-53 0-82-13-82-38z" fill="#69d2a3" stroke="#27815f" stroke-width="6" />
+                  <circle cx="86" cy="104" r="10" fill="#effdf6" />
+                  <circle cx="118" cy="100" r="11" fill="#effdf6" />
+                  <circle cx="88" cy="106" r="4" fill="#1f5c46" />
+                  <circle cx="121" cy="102" r="4" fill="#1f5c46" />
+                  <path d="M83 124c10 6 22 6 32 0" fill="none" stroke="#1f5c46" stroke-linecap="round" stroke-width="6" />
+                </svg>
+              </div>
+              <h3>裂滴獸</h3>
+              <p class="enemy-role">Split unit</p>
+              <p>像甜美果凍裡藏著碎玻璃。分裂不是複製，而像一團液態靈魂甩出新的悲鳴。</p>
+            </article>
+            <article class="enemy-card enemy-card--flyer">
+              <div class="enemy-card__art" aria-hidden="true">
+                <svg viewBox="0 0 180 180" role="presentation">
+                  <path d="M90 64c-16 0-30 14-30 32s14 32 30 32 30-14 30-32-14-32-30-32z" fill="#79d0ef" stroke="#2a799d" stroke-width="6" />
+                  <path d="M60 83c-20-12-40-8-50 16 20 1 35 10 50 24M120 83c20-12 40-8 50 16-20 1-35 10-50 24" fill="none" stroke="#2a799d" stroke-linecap="round" stroke-width="8" />
+                  <circle cx="82" cy="96" r="8" fill="#f7fdff" />
+                  <circle cx="100" cy="96" r="8" fill="#f7fdff" />
+                  <path d="M82 113c5 4 11 4 16 0" fill="none" stroke="#244b63" stroke-linecap="round" stroke-width="4" />
+                </svg>
+              </div>
+              <h3>燈蛾</h3>
+              <p class="enemy-role">Air unit</p>
+              <p>像典禮燈籠與紙蛾混血，漂亮得不該被打，卻會一邊漂浮一邊偷走視線焦點。</p>
+            </article>
+            <article class="enemy-card enemy-card--mini">
+              <div class="enemy-card__art" aria-hidden="true">
+                <svg viewBox="0 0 180 180" role="presentation">
+                  <circle cx="90" cy="96" r="32" fill="#f5877d" stroke="#ae433f" stroke-width="6" />
+                  <circle cx="79" cy="92" r="9" fill="#fff4f0" />
+                  <circle cx="102" cy="92" r="9" fill="#fff4f0" />
+                  <circle cx="81" cy="94" r="4" fill="#58292f" />
+                  <circle cx="104" cy="94" r="4" fill="#58292f" />
+                  <path d="M79 112c6 6 17 6 23 0" fill="none" stroke="#58292f" stroke-linecap="round" stroke-width="5" />
+                  <path d="M72 72l-14-13M108 72l14-13M80 127l-10 14M100 127l10 14" fill="none" stroke="#58292f" stroke-linecap="round" stroke-width="7" />
+                </svg>
+              </div>
+              <h3>豆靈</h3>
+              <p class="enemy-role">Swarm unit</p>
+              <p>看起來最無害，實際上最煩。像把惡作劇情緒本身做成一顆會跑的果核。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel section section--art" id="art-direction">
+          <div class="section-heading">
+            <p class="eyebrow">Art Direction</p>
+            <h2>真正能撐住獎項審美的風格規格</h2>
+          </div>
+          <div class="art-grid">
+            <article class="art-card">
+              <h3>世界材質</h3>
+              <p>主角陣營像手工鐘錶與祭器，反派陣營像被火烤過的糖雕、掉漆木偶與濕掉的舞台布景。畫面應該讓人聞得到木頭、金屬、蜂蠟和灰燼。</p>
+            </article>
+            <article class="art-card">
+              <h3>輪廓語言</h3>
+              <p>守護方用立起來的垂直線條與圓弧，代表秩序與祈禱；裂界方用偏斜、前傾、被拉長的關節，代表竊取與失衡。</p>
+            </article>
+            <article class="art-card">
+              <h3>表情控制</h3>
+              <p>不要濫用兇狠。真正高級的角色會用眼距、眼白、停頓、抬頭角度來表演情緒。反派越美、越像在微笑，越危險。</p>
+            </article>
+            <article class="art-card">
+              <h3>色彩劇場</h3>
+              <p>不是兒童彩虹盤。每一層世界只留一組主色、一組神性色、一組危險色，讓角色一進場就像帶著自己的舞台燈。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel section">
+          <div class="section-heading">
+            <p class="eyebrow">Boss Pantheon</p>
+            <h2>五位王不能只是大型版小怪</h2>
+          </div>
+          <div class="boss-grid">
+            <article class="boss-card">
+              <div class="boss-card__art" aria-hidden="true">
+                <svg viewBox="0 0 220 200" role="presentation">
+                  <rect x="48" y="38" width="124" height="108" rx="34" fill="#90a968" stroke="#4d6b34" stroke-width="8" />
+                  <path d="M74 38l-16-28M146 38l16-28" fill="none" stroke="#4d6b34" stroke-linecap="round" stroke-width="10" />
+                  <circle cx="88" cy="86" r="11" fill="#fffaf2" />
+                  <circle cx="132" cy="86" r="11" fill="#fffaf2" />
+                  <path d="M86 115c13 10 35 10 48 0" fill="none" stroke="#32471f" stroke-linecap="round" stroke-width="8" />
+                </svg>
+              </div>
+              <strong>Layer I</strong>
+              <h3>稻浪巨偶</h3>
+              <p>一個你會想擁抱、但抱下去會被壓死的田野守神。它的恐怖感來自慈祥，不來自猙獰。</p>
+            </article>
+            <article class="boss-card">
+              <div class="boss-card__art" aria-hidden="true">
+                <svg viewBox="0 0 220 200" role="presentation">
+                  <path d="M66 154c0-56 28-102 54-102 38 0 54 29 54 61 0 38-21 63-57 63-26 0-51-10-51-22z" fill="#59aacd" stroke="#1f5b74" stroke-width="8" />
+                  <circle cx="100" cy="101" r="10" fill="#f3fbff" />
+                  <circle cx="130" cy="96" r="12" fill="#f3fbff" />
+                  <circle cx="147" cy="67" r="18" fill="none" stroke="#b7ebff" stroke-width="8" />
+                </svg>
+              </div>
+              <strong>Layer II</strong>
+              <h3>潮鐘海蛇</h3>
+              <p>像教堂鐘聲被泡進深海之後長出鱗片。美、長、慢、不可忽視，是一種莊嚴的威脅。</p>
+            </article>
+            <article class="boss-card">
+              <div class="boss-card__art" aria-hidden="true">
+                <svg viewBox="0 0 220 200" role="presentation">
+                  <rect x="42" y="50" width="136" height="104" rx="32" fill="#ca6d45" stroke="#742b18" stroke-width="8" />
+                  <path d="M56 50l18-24h72l18 24" fill="#ffb169" stroke="#742b18" stroke-width="8" stroke-linejoin="round" />
+                  <circle cx="91" cy="97" r="11" fill="#fff4eb" />
+                  <circle cx="129" cy="97" r="11" fill="#fff4eb" />
+                </svg>
+              </div>
+              <strong>Layer III</strong>
+              <h3>熔核甲王</h3>
+              <p>像鍛爐、甲蟲與公牛三種象徵揉成一個王。要有「重量正在往你身上倒」的壓迫感。</p>
+            </article>
+            <article class="boss-card">
+              <div class="boss-card__art" aria-hidden="true">
+                <svg viewBox="0 0 220 200" role="presentation">
+                  <path d="M110 28l36 24v43c0 31-18 55-36 66-18-11-36-35-36-66V52z" fill="#7b88ef" stroke="#32418d" stroke-width="8" />
+                  <path d="M56 86l33 14M164 86l-33 14" fill="none" stroke="#61d9ff" stroke-linecap="round" stroke-width="10" />
+                  <circle cx="91" cy="93" r="10" fill="#f7fbff" />
+                  <circle cx="129" cy="93" r="10" fill="#f7fbff" />
+                </svg>
+              </div>
+              <strong>Layer IV</strong>
+              <h3>極光鏡后</h3>
+              <p>不是性感女王，而是像光學儀器自己誕生了靈魂。優雅、冷、精準，危險在於太美。</p>
+            </article>
+            <article class="boss-card">
+              <div class="boss-card__art" aria-hidden="true">
+                <svg viewBox="0 0 220 200" role="presentation">
+                  <path d="M42 130c0-43 28-75 66-75 23-15 52-10 69 12 16 20 18 51-1 73-17 20-49 30-85 30-29 0-49-16-49-40z" fill="#5951a6" stroke="#231f56" stroke-width="8" />
+                  <path d="M131 60l28-26M145 88l33-8" fill="none" stroke="#f58dc8" stroke-linecap="round" stroke-width="10" />
+                  <circle cx="97" cy="100" r="10" fill="#fef7ff" />
+                  <circle cx="126" cy="95" r="11" fill="#fef7ff" />
+                </svg>
+              </div>
+              <strong>Layer V</strong>
+              <h3>龍脈裂界龍</h3>
+              <p>牠不是一條龍，而是整片天空裂開後想成為王的那道意志。終局感要大於生物感。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel section section--final">
+          <div class="section-heading">
+            <p class="eyebrow">Production Order</p>
+            <h2>接下來真的該怎麼做</h2>
+          </div>
+          <div class="final-grid">
+            <article class="manifesto-card">
+              <h3>第一步</h3>
+              <p>先把遊戲內一般敵人全部改成這套新敵系，保留數值與碰撞，只換角色設計與繪製語言。</p>
+            </article>
+            <article class="manifesto-card">
+              <h3>第二步</h3>
+              <p>再把主角里拉換進遊戲 HUD 與開場，讓玩家一進入就知道自己在操作一個角色，而不是一個機制。</p>
+            </article>
+            <article class="manifesto-card">
+              <h3>第三步</h3>
+              <p>最後做五位 Boss 的進場演出與一層一位的舞台構圖，讓世界觀真的變成遊戲體驗，而不是設定文件。</p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

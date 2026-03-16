@@ -29,6 +29,45 @@ test("loads and starts a playable run", async ({ page }) => {
   expect(snapshot.currentRow.blocks.length).toBeGreaterThan(0);
 });
 
+test("13-inch desktop layout prioritizes the playfield", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/index.html");
+  await page.waitForFunction(() => Boolean(window.__gameDebug));
+
+  await expect.poll(() => page.locator("body").getAttribute("data-compact-desktop")).toBe("true");
+
+  const metrics = await page.evaluate(() => {
+    const gamePanel = document.querySelector(".game-panel");
+    const frame = document.querySelector(".game-frame");
+    const guide = document.querySelector(".layer-guide");
+    const touchControls = document.querySelector(".touch-controls");
+    const playArea = document.querySelector(".play-area");
+
+    return {
+      panelHeight: gamePanel?.getBoundingClientRect().height ?? 0,
+      panelWidth: gamePanel?.getBoundingClientRect().width ?? 0,
+      frameHeight: frame?.getBoundingClientRect().height ?? 0,
+      frameWidth: frame?.getBoundingClientRect().width ?? 0,
+      frameLeft: frame?.getBoundingClientRect().left ?? 0,
+      guideHeight: guide?.getBoundingClientRect().height ?? 0,
+      touchHeight: touchControls?.getBoundingClientRect().height ?? 0,
+      touchWidth: touchControls?.getBoundingClientRect().width ?? 0,
+      touchLeft: touchControls?.getBoundingClientRect().left ?? 0,
+      playAreaWidth: playArea?.getBoundingClientRect().width ?? 0,
+      viewportHeight: window.innerHeight,
+    };
+  });
+
+  expect(metrics.frameHeight).toBeGreaterThan(600);
+  expect(metrics.panelWidth).toBeGreaterThan(600);
+  expect(Math.abs(metrics.frameLeft - metrics.touchLeft)).toBeLessThan(8);
+  expect(metrics.panelHeight).toBeLessThanOrEqual(metrics.viewportHeight);
+  expect(metrics.guideHeight).toBeGreaterThan(30);
+  expect(metrics.touchWidth).toBeGreaterThan(metrics.frameWidth * 0.92);
+  expect(metrics.touchWidth).toBeLessThanOrEqual(metrics.frameWidth * 1.02);
+  expect(metrics.playAreaWidth).toBeGreaterThanOrEqual(metrics.frameWidth);
+});
+
 test("keyboard lane switching updates game state", async ({ page }) => {
   await startGame(page);
 
@@ -97,4 +136,86 @@ test("ultimate button exposes cooldown progress and ready state", async ({ page 
   await expect(hudValue).toHaveText("READY!");
   await expect(button).toBeEnabled();
   await expect(button).toHaveAttribute("data-ready", "true");
+});
+
+test("layer guide shows current layer and per-layer progress", async ({ page }) => {
+  await startGame(page);
+
+  const current = page.locator("#layer-guide-current");
+  const stage = page.locator("#layer-guide-stage");
+  const fill = page.locator("#layer-guide-fill");
+  const activeDot = page.locator('.layer-guide__dot[data-state="current"]');
+
+  await expect(current).toHaveText("第1層");
+  await expect(stage).toHaveText("1 / 20");
+  await expect(activeDot).toHaveCount(1);
+
+  const width = await fill.evaluate((node) => node.style.width);
+  expect(width).not.toBe("0%");
+});
+
+test("generated non-boss rows always include at least one reward block", async ({ page }) => {
+  await page.goto("/index.html");
+  await page.waitForFunction(() => Boolean(window.__gameDebug));
+
+  const rows = await page.evaluate(() => window.__gameDebug.sampleRowsForTest(40, 0));
+
+  for (const row of rows) {
+    expect(row.blocks.some((block) => block.entityType === "item" && block.rewardValue > 0)).toBe(true);
+  }
+});
+
+test("dual reward rows preserve a clear low-risk high-reward split", async ({ page }) => {
+  await page.goto("/index.html");
+  await page.waitForFunction(() => Boolean(window.__gameDebug));
+
+  const rows = await page.evaluate(() => window.__gameDebug.sampleRowsForTest(60, 0));
+  const dualItemRows = rows.filter((row) => row.blocks.filter((block) => block.entityType === "item").length === 2);
+
+  expect(dualItemRows.length).toBeGreaterThan(0);
+  for (const row of dualItemRows) {
+    const [a, b] = row.blocks.filter((block) => block.entityType === "item");
+    expect(Math.abs(a.rewardValue - b.rewardValue) > 0.2 || a.rewardType !== b.rewardType).toBe(true);
+  }
+});
+
+test("ultimate stays locked below 100 percent charge", async ({ page }) => {
+  await startGame(page);
+
+  await page.evaluate(() => {
+    window.__gameDebug.setUltimateChargeForTest(80);
+  });
+
+  await expect(page.locator("#ultimate-cooldown")).toHaveText("還要 20%");
+  await expect(page.locator("#ultimate-value")).toHaveText("還要 20%");
+  await expect(page.locator("#ultimate-button")).toBeDisabled();
+  await expect(page.locator("#ultimate-button")).toHaveAttribute("data-ready", "false");
+});
+
+test("iphone 12 viewport fits the whole game without page scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await startGame(page);
+
+  const metrics = await page.evaluate(() => {
+    const scrollingElement = document.scrollingElement;
+    const gamePanel = document.querySelector(".game-panel");
+    const gameFrame = document.querySelector(".game-frame");
+    const touchControls = document.querySelector(".touch-controls");
+
+    return {
+      scrollHeight: scrollingElement?.scrollHeight ?? 0,
+      clientHeight: scrollingElement?.clientHeight ?? 0,
+      panelBottom: gamePanel?.getBoundingClientRect().bottom ?? 0,
+      frameBottom: gameFrame?.getBoundingClientRect().bottom ?? 0,
+      controlsBottom: touchControls?.getBoundingClientRect().bottom ?? 0,
+      viewportHeight: window.innerHeight,
+      handheld: document.body.dataset.handheld,
+    };
+  });
+
+  expect(metrics.handheld).toBe("true");
+  expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
+  expect(metrics.panelBottom).toBeLessThanOrEqual(metrics.viewportHeight);
+  expect(metrics.frameBottom).toBeLessThanOrEqual(metrics.viewportHeight);
+  expect(metrics.controlsBottom).toBeLessThanOrEqual(metrics.viewportHeight);
 });
